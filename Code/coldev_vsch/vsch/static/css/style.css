@@ -1,0 +1,47 @@
+#wrapper 
+{
+	
+	width:766px; 
+	height:767px;
+	margin-top:30px;
+	margin-left: auto;
+	margin-right: auto;
+	background: red;
+}
+
+#header
+{
+	width: 766px;
+	height: 82px;
+	border: 1px black;
+	margin: auto;
+	background: green;
+	float: left;
+}
+
+#logo
+{
+	width: 119px;
+	height: 81px;
+	margin: auto;
+	float: left;
+}
+
+#menu
+{
+	width: 645px;
+	height: 81px;
+	margin: auto;
+	float: left;
+}
+
+#footer 
+{
+	width: 766px;
+	height: 50px;
+	margin-bottom: 10px;
+	background: violet;
+	margin-left: auto;
+	margin-right: auto;
+
+}

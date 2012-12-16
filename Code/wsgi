@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+
+	ServerName loc.vashchenko.com
+	DocumentRoot /srv/www/coldev_vsch
+
+	<Directory /srv/www/coldev_vsch>
+		Order allow,deny
+		Allow from all
+	</Directory>
+
+	WSGIScriptAlias / /srv/www/coldev_vsch/wsgi
+
+</VirtualHost>
