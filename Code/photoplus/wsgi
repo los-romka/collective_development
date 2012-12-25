@@ -1,5 +1,5 @@
 """
- WSGI config for coldev_vsch project.
+WSGI config for photoplus project.
 
 This module contains the WSGI application used by Django's development server
 and any production WSGI deployments. It should expose a module-level variable
@@ -16,9 +16,9 @@ framework.
 import os
 import sys
 
-path = 'srv/www/coldev_vsch'
+path = '/srv/www/photoplus'
 if path not in sys.path:
-	sys.path.insert(0,'srv/www/coldev_vsch')
+	sys.path.insert(0,'/srv/www/photoplus')
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
