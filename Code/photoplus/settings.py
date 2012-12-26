@@ -1,4 +1,4 @@
-# Django settings for coldev_vsch project.
+# Django settings for photoplus project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -12,8 +12,8 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'coldev_vsch',                      # Or path to database file if using sqlite3.
-        'USER': 'interbellum',                      # Not used with sqlite3.
+        'NAME': 'photoplus',                      # Or path to database file if using sqlite3.
+        'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': '123',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
@@ -56,7 +56,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = 'vsch/static/'
+STATIC_ROOT = '/srv/www/photoplus/frontend/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -64,7 +64,8 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    "/srv/www/coldev_vsch/static"
+    "/srv/www/photoplus/frontend/static",
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
@@ -74,11 +75,11 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'q(ig)(fyy$5lbi^ffxb-o)g*h2+9m=gq05$tia-rajmwrcdj2q'
+SECRET_KEY = '8*!&amp;md2j8@kl-r_7l=+1ak!gh82wk*qfz7by)qjt)46w-y&amp;o#9'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -119,7 +120,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-     'vsch',
+     'frontend',
 )
 
 # A sample logging configuration. The only tangible logging
