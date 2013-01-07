@@ -1,0 +1,28 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css" > 
+</head>
+
+<body>
+	<div id = "wrapper">
+
+		<div id = "header">
+			<div id = "logo">
+			<img src="frontend/static/img/1.gif">
+			</div>
+
+			<div id = "menu">
+			<img src="static/2.gif">
+			</div>
+		</div>
+		
+		<div id = "content">
+		</div>
+	
+	</div>
+	
+	<div id = "footer">
+	</div>
+</body>
+
+</html>
