@@ -1,13 +1,16 @@
 <VirtualHost *:80>
 
 	ServerName loc.vashchenko.com
-	DocumentRoot /srv/www/coldev_vsch
+	DocumentRoot /srv/www/photoplus
+	AliasMatch ^/([^/]*\.css) /srv/www/photoplus/static/css/$1
 
-	<Directory /srv/www/coldev_vsch>
+	<Directory /srv/www/photoplus>
 		Order allow,deny
 		Allow from all
 	</Directory>
 
-	WSGIScriptAlias / /srv/www/coldev_vsch/wsgi
+	WSGIScriptAlias / /srv/www/photoplus/wsgi
+	Alias /static /srv/www/photoplus/static/
+	Alias /media  /srv/www/photoplus/media/
 
 </VirtualHost>
