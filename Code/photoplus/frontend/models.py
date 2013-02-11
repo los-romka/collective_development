@@ -1,10 +1,8 @@
 from django.db import models
 
 class Post(models.Model):
-	post_url = models.CharField(max_length=200)
 	image_url = models.CharField(max_length=200)
-	creation_date = models.DateTimeField('date of creation')
-	renewal_date = models.DateTimeField('date of renewal')
+	renew = models.DateTimeField('date of renewal')
 
 	def __unicode__(self):
 		return self.name
@@ -25,6 +23,8 @@ class Album(models.Model):
 	def __unicode__(self):
 		return self.name
 
-	
 
-
+class Admin(models.Model):
+	login = models.CharField(max_length=200)
+	hashpass = models.CharField(max_length=200)
+	renew = models.DateTimeField('date of total renewal')

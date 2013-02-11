@@ -1,51 +1,45 @@
-<html>
-<head>
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+        <meta charset="utf-8">
+		<link rel='icon' href="static/images/i.png" type='image/x-icon'> 
+		<title>INTERBELLUM</title>
+			<!-- Bootstrap -->
+		<link href="static/css/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen" >
+		<link href="static/css/style.css" rel="stylesheet" type="text/css" >
+	</head>
 
-	<link rel="stylesheet" type="text/css" href="style.css" /> </head>
 
-<body>
-	<div id = "wrapper">
-
-		<div id = "header">
-			<div id = "logo">
-				<img src = "static/images/a.png" width = "115px" height = "65px">
-			</div>
-
-			<div id = "menu">
-				<a href = "/">
-					<div class = "menu_item">
-						<img src = "static/images/home.gif"  height = "50px">
-						<p>Home</p>
-					</div>
-				</a>
-
-				<a href = "/albums/">
-					<div class = "menu_item">
-						<img src = "static/images/albums.jpg" height = "50px">
-						<p>Albums</p>
-					</div>
-				</a>
-
-				<a href = "/about/">
-					<div class = "menu_item">
-						<img src = "static/images/about.gif" height = "50px"> 
-						<p>About me</p>
-					</div>
-				</a>
+	<body>
+		<div class="container">
+            
+            <!--  -->
+			<div class="span12">
+                <div class="navbar ">
+                    <div class="navbar-inner ">
+                       <a class="brand" href="#"> Vashchenko </a>
+                       
+                       <ul class="nav">
+                            <div class="span2"></div>
+                            <li class="active"><a href="#"> Home </a></li>
+                            <li><a href="#"> Albums </a></li>
+                            <li><a href="#"> About me</a></li>
+                       </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h1 id="center" class = "muted">Welcome to VASHCHENKO.COM </h1>
+                
+                <h1> Home </h1>
+                {% for e in lst %}
+                    <img src="{{ e }}">
+                {% endfor %}  
+                <hr>
 			</div>
 		</div>
-
-		<th>
-		
-		<div id = "content">
-		</div>
-	
-	</div>
-
-	<div id = "footer">
-			<p>2013 &copy Copyright.   All rights reserved.</p>
-	</div>
-
-</body>
-
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
 </html>
