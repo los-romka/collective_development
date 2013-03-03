@@ -21,13 +21,14 @@ from sys                 import *
 
 def get_tags_list( hashstring ):
 
-    spis = []
+    hashstring = hashstring.replace("&#","")
+    tags_list = []
     for e in range( 0,hashstring.count("ot-hashtag") ):
         r = hashstring.find('#')+1
         hashstring = hashstring[r:]
         t = hashstring.find('<')
-        spis.append( hashstring[:t] )
-    return spis
+        tags_list.append( hashstring[:t] )
+    return tags_list
 
 
 
@@ -75,15 +76,32 @@ def api_data_extraction():
 def refresh_db_with_new_data( ):
 
     new_data = api_data_extraction()
+    
+    posts_list = []
+    for el in Post.objects.all():
+        posts_list.append( el.image_url )
+
     for element in new_data:
-        p = Post( image_url = element[0] , renew = element[1] )
-        p.save()
+        if element[0] not in posts_list:
+            p = Post( image_url = element[0] , renew = element[1] )
+            p.save()
+        else:
+            p = Post.objects.get( image_url = element[0] )
+
         if len(element) == 3:
+            tags_list = []
+            for el in Tag.objects.all():
+                tags_list.append( el.name )
             for tag in element[2]:
-                t = Tag ( name = tag )
-                t.save()
-                t.posts.add(p)
-                t.save()
+                if tag not in tags_list:
+                    t = Tag ( name = tag )
+                    t.save()
+                    t.posts.add(p)
+                    t.save()
+                else:
+                    t = Tag.objects.filter( name = tag )[0]
+                    t.posts.add(p)
+                    t.save()
     return
 
 
@@ -94,8 +112,8 @@ def clear_db( ):
 
     p = Post.objects.all()
     t = Tag.objects.all()
-    p.entry_set.clear()
-    t.entry_set.clear()
+    p.clear()
+    t.clear()
     return
 
 
@@ -120,11 +138,17 @@ def about( request ):
 
 def home( request ):
 
-    #refresh_db_with_new_data()
+    refresh_db_with_new_data()
+    #clear_db()
     try:
         p = Post.objects.all()
     except Post.DoesNotExist:
         raise Http404
+
+#    from django.core.mail import send_mail
+#    send_mail('Subject here', 'Here is the message.', 'forzalino@gmail.com',
+#    ['forzalino@gmail.com'], fail_silently=False)
+
     return render_to_response('index.html',{ 'lst':p })
 
 
