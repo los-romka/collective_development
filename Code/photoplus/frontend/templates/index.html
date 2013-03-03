@@ -2,11 +2,11 @@
 <html lang="ru">
 	<head>
         <meta charset="utf-8">
-		<link rel='icon' href="static/images/i.png" type='image/x-icon'> 
+		<link rel='icon' href="static/frontend/img/i.png" type='image/x-icon'> 
 		<title>INTERBELLUM</title>
 			<!-- Bootstrap -->
-		<link href="static/css/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen" >
-		<link href="static/css/style.css" rel="stylesheet" type="text/css" >
+		<link href="static/frontend/css/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen" >
+		<link href="static/frontend/css/style.css" rel="stylesheet" type="text/css" >
 	</head>
 
 
@@ -35,7 +35,7 @@
                 <h1> Home </h1>
                 {% for e in lst %}
                     <img src="{{ e.image_url }}">
-                    <p>  </p>
+                    <p> {{ e.tag_set.all }} </p>
                 {% endfor %}  
                 <hr>
 			</div>
