@@ -16,8 +16,6 @@ class Post ( models.Model ):
 
 
 
-
-
 # Contains information about a tag
 
 class Tag ( models.Model ):
@@ -25,7 +23,8 @@ class Tag ( models.Model ):
 	name = models.CharField( max_length=200 )
 	posts = models.ManyToManyField( Post )
 
-
+	def __unicode__( self ):
+		return self.name
 
 
 
@@ -37,8 +36,8 @@ class Album ( models.Model ):
 	name = models.CharField( max_length=200 )
 	tags = models.ManyToManyField( Tag )
 
-#	def __unicode__( self ):
-#		return self.name
+	def __unicode__( self ):
+		return self.name
 
 
 
