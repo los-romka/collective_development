@@ -4,7 +4,11 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
+<<<<<<< HEAD
  ('admin', '1@gmail.com'),
+=======
+ ('sin', 'justexit007@gmail.com'),
+>>>>>>> b7ba8c47a190294fbc0efea204013bee03552c3a
 )
 
 MANAGERS = ADMINS
@@ -116,9 +120,17 @@ LOGGING = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+<<<<<<< HEAD
 DEFAULT_FROM_EMAIL = '@gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = '@gmail.com'
 EMAIL_HOST_PASSWORD = 'password'
+=======
+DEFAULT_FROM_EMAIL = 'justexit007@gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'justexit007@gmail.com'
+EMAIL_HOST_PASSWORD = '645811Aa'
+>>>>>>> b7ba8c47a190294fbc0efea204013bee03552c3a
 EMAIL_PORT = 587
