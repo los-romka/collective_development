@@ -6,19 +6,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # url(r'^$', 'photoplus.views.home', name='home'),
     # Examples:
-    url(r'^about/feedback/', contact),
-    
+    # url(r'^$', 'photoplus.views.home', name='home'),
     url(r'^about/$', about),
     url(r'^albums/$', albums),
-    url(r'^search-form/$', search_form),
-   
-   
-   
-    
-   
-	
     url(r'^$',home),
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

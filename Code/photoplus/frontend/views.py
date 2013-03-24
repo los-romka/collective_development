@@ -5,15 +5,10 @@ from django.http         import Http404
 from django.shortcuts    import render_to_response
 from django.template     import Context, loader
 from django.http         import HttpResponse
+
 from apiclient.discovery import build
 from frontend.models     import *
 from sys                 import *
-from django.core.mail 	 import send_mail
-from django.template  	 import RequestContext
-from django.http 	 import HttpResponseRedirect
-from frontend.forms  	 import ReCaptchaForm
-
-
 
 
 
@@ -129,9 +124,7 @@ def albums( request ):
 
     return render_to_response('albums.html')
 
-def feedback( request ):
 
-    return render_to_response('feedback.html')
 
 
 
@@ -159,35 +152,5 @@ def home( request ):
     return render_to_response('index.html',{ 'lst':p })
 
 
-
-def search_form(request):
-
-    return render_to_response('search_form.html')
-
-
-
-def contact(request):
-
-    form = ReCaptchaForm()
-    if request.POST:
-        form = ReCaptchaForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            send_mail(
-                cd['subject'],
-                cd['message'],
-                cd.get('email', 'kovalenko.stasiya@gmail.com'), ['kovalenishe@mail.ru'], fail_silently=False
-           	     )
-
-	#	send_mail('subjectsubjectsubject','me message message message message', 'lexalexa-setset@mail.ru', 'kovalenko.stasiya@gmail.com'),
-
-            return HttpResponseRedirect('/about/')
-    else:
-        form = ReCaptchaForm( # initial={'subject': 'I love your site!'}
-			     )
-    return render_to_response('contact.html', {'form': form}, context_instance=RequestContext(request))
-
-def thanks(request):
-    return render_to_response('thanks.html')
 
 
