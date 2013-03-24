@@ -1,0 +1,42 @@
+<html>
+<head>
+    <title>Contact us</title>
+</head>
+<body>
+ 
+  <fieldset>
+ <legend>
+         <h2>Leave feedback</h2>
+ </legend>
+
+    <form action="" method="post">{% csrf_token %}
+        <div class="field">
+            {% if form.subject.errors %}
+            	<label style="color: red;", for="id_subject">Subject:</label>	  
+	   {% else %}
+		<label style="color: black;", for="id_subject">Subject:</label> 	
+	   {% endif %}
+            {{ form.subject }}
+        </div>
+ 
+        <div class="field">
+            {% if form.email.errors %}
+          	 <label style="color: red;" , for="id_email">Your e-mail:</label>
+ 	   {% else %}
+		 <label style="color: black;" , for="id_email">Your e-mail:</label>
+	   {% endif %}
+            {{ form.email }}
+        </div>
+        <div class="field">
+            {% if form.message.errors %}
+                 <label style="color: red;" , for="id_message">Message:</label>
+	    {% else %}
+		 <label style="color: black;" , for="id_message">Message:</label>
+	   {% endif %}
+            {{ form.message }}
+        </div>
+  </fieldset>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
