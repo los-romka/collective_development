@@ -43,7 +43,7 @@ img
 	text-align: center;
 }
 
-td
+.td
 {
     padding: 10px; 
 }

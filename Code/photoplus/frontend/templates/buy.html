@@ -28,39 +28,68 @@
                         <li><a href="/about/">ABOUT</a></li>
                    </ul>
                 </div>
-            </div>
-            
-			<div id="content">     
+            </div>          
+<div id="content">
+
+ 
   <fieldset>
  <legend>
-         <h2>Leave feedback</h2>
+         <h2>photo купить</h2>
  </legend>
+
+   <p> {{ buy.message}} </p>
 
     <form action="" method="post">
         <div class="field">
-            {% if form.subject.errors %}
-            	<label style="color: red;", for="id_subject">Subject:</label>	  
+            {% if form.FirstName.errors %}
+            	<label style="color: red;">First Name</label>	  
 	   {% else %}
-		<label style="color: black;", for="id_subject">Subject:</label> 	
+		<label style="color: black;">First Name</label> 	
 	   {% endif %}
-            {{ form.subject }}
+            {{ form.FirstName }}
+        </div>
+  	<div class="field">
+            {% if form.LastName.errors %}
+            	<label style="color: red;">Last Name</label>	  
+	   {% else %}
+		<label style="color: black;">Last Name</label> 	
+	   {% endif %}
+            {{ form.LastName }}
         </div>
  
         <div class="field">
-            {% if form.email.errors %}
-          	 <label style="color: red;" , for="id_email">Your e-mail:</label>
+            {% if form.Email.errors %}
+          	 <label style="color: red;">Email</label>
  	   {% else %}
-		 <label style="color: black;" , for="id_email">Your e-mail:</label>
+		 <label style="color: black;" , for="id_email">Email</label>
 	   {% endif %}
-            {{ form.email }}
+            {{ form.Email }}
         </div>
+
         <div class="field">
-            {% if form.message.errors %}
-                 <label style="color: red;" , for="id_message">Message:</label>
-	    {% else %}
-		 <label style="color: black;" , for="id_message">Message:</label>
+		 <label style="color: black;" , for="id_email">Country</label>
+		{{ form.Country }}
+	</div>
+
+	 <div class="field">
+            {% if form.Adress.errors %}
+            	<label style="color: red;">Adress</label>	  
+	   {% else %}
+		<label style="color: black;">Adress</label> 	
 	   {% endif %}
-            {{ form.message }}
+            {{ form.Adress }}
+        </div>
+
+	<div class="field">
+            {% if form.Index.errors %}
+            	<label style="color: red;">Index</label>	  
+	   {% else %}
+		<label style="color: black;">Index</label> 	
+	   {% endif %}
+            {{ form.Index }}
+        </div>
+
+
         </div>
 	<div class="field">
 	   {% if form.captcha.errors %}
@@ -73,24 +102,6 @@
   </fieldset>
         <input id="submit" type="submit" value="Submit">
     </form>
-   </div>
-	<div id="blank-footer">
-			</div>
-			<div id="footer">
-				<hr />
-				<span class="muted">Yuri Vashchenko. All rights reserved</span>
-			</div>
-		</div>
-		<script>
-			$('.nav').children('.dropdown').hover(
-			function(){
-			$(this).addClass('open');
-			},
-			function(){
-			$(this).removeClass('open');
-			});
-		</script>
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
-		<script src="/static/frontend/css/bootstrap/js/bootstrap.js"></script>
-	</body>       
+ </div>       
+</body>
 </html>
