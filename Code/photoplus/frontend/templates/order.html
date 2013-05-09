@@ -30,50 +30,58 @@
                 </div>
             </div>
             
-			<div id="content">     
-  <fieldset>
- <legend>
-         <h2>Leave feedback</h2>
- </legend>
+			<div id="content">
+				 <fieldset>
+				 <legend>
+					 <h2>Selected order</h2>
+				 </legend>
 
-    <form action="" method="post">
-        <div class="field">
-            {% if form.subject.errors %}
-            	<label style="color: red;", for="id_subject">Subject:</label>	  
-	   {% else %}
-		<label style="color: black;", for="id_subject">Subject:</label> 	
-	   {% endif %}
-            {{ form.subject }}
-        </div>
- 
-        <div class="field">
-            {% if form.email.errors %}
-          	 <label style="color: red;" , for="id_email">Your e-mail:</label>
- 	   {% else %}
-		 <label style="color: black;" , for="id_email">Your e-mail:</label>
-	   {% endif %}
-            {{ form.email }}
-        </div>
-        <div class="field">
-            {% if form.message.errors %}
-                 <label style="color: red;" , for="id_message">Message:</label>
-	    {% else %}
-		 <label style="color: black;" , for="id_message">Message:</label>
-	   {% endif %}
-            {{ form.message }}
-        </div>
-	<div class="field">
-	   {% if form.captcha.errors %}
-          	 <label style="color: red;" , for="id_email">Code in the image:</label>
- 	   {% else %}
-		 <label style="color: black;" , for="id_email">Code in the image:</label>
-	   {% endif %}
-            {{ form.captcha }} 
-	</div>
-  </fieldset>
-        <input id="submit" type="submit" value="Submit">
-    </form>
-   </div>
+ {% for e in ordersall %}
+					   {% if e.id =  orderlast.id %}
+						<p>Your last order: {{e.id}}</p>
+						<p>Name:            {{e.name}}</p>
+						<p>Adress: 	    {{e.adress}}</p>
+						<p>Photo url:       {{e.photo_id}}</p>
+						<p>Price:           {{e.price}} </p>
+						<p>Size:            {{e.size}}</p>
+						<p>Status:          {{e.status}}</p>
+					   {% endif %}
+                                {% endfor %}
+
+<br>
+<br>
+
+<h3>All orders:</h3>
+<table align="center" padding="7" border="2">
+	<thead>
+		<tr>
+			<td>Order Id</td>
+			<td>First name, last name</td>
+			<td>Adress</td>
+			<td>Photo</td>
+			<td>Price</td>
+			<td>Size</td>
+			<td>Status</td>
+		</tr>
+	</thead>
+
+	<tbody>
+	{% for e in ordersall %}
+		<tr>	
+			<td>{{e.id}}</td>
+			<td>{{e.name}}</td>
+			<td>{{e.adress}}</td>
+			<td>{{e.photo_id}}</td>
+			<td>{{e.price}}</td>
+			<td>{{e.size}}</td>
+			<td>{{e.status}}</td>
+		<tr>			
+	 {% endfor %}
+	</tbody>
+</table>
+
+				
+			 </div>
 	<div id="blank-footer">
 			</div>
 			<div id="footer">
@@ -92,5 +100,7 @@
 		</script>
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<script src="/static/frontend/css/bootstrap/js/bootstrap.js"></script>
-	</body>       
+	</body>
 </html>
+
+
