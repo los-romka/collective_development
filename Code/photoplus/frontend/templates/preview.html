@@ -79,7 +79,7 @@
 		</div>
 		<script>
 			function buy_try() { 
-				document.location.href = window.location.protocol.replace(/\:/g, ”) + "//" + window.location.host + "/" + {{ photo.id }} + '/' + $('input[name="priceRadios"]:checked').val() + '/';
+				document.location.href = '../../buy/' + {{ photo.id }} + '/' + $('input[name="priceRadios"]:checked').val() + '/';
 			}
 			document.getElementById("buyButton").onclick = buy_try;
 		</script>
