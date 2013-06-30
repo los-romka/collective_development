@@ -79,7 +79,7 @@
 		</div>
 		<script>
 			function buy_try() { 
-				document.location.href = 'http://loc.vashchenko.com/buy/' + {{ photo.id }} + '/' + $('input[name="priceRadios"]:checked').val() + '/';
+				document.location.pathname = 'buy/' + {{ photo.id }} + '/' + $('input[name="priceRadios"]:checked').val() + '/';
 			}
 			document.getElementById("buyButton").onclick = buy_try;
 		</script>
