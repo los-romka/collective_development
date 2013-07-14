@@ -147,7 +147,6 @@ def contact(request):
 
 
 def buy(request, idP, resolution):    
-
     try:
 	al = Album.objects.all()
         a = Message.objects.get(id=1)
@@ -158,8 +157,12 @@ def buy(request, idP, resolution):
     except Post.DoesNotExist:
         raise Http404
    
-    t = Template(a.information)
-    s = Template(a.subject)
+    t_to = Template(a.information_to) #to you
+    t_from = Template(a.information_from) #from you/ means from admin
+    s_to = Template(a.subject_to)
+    s_from = Template(a.subject_from)
+
+    codepage = request.get_host()
        
     form = buyForm()
     if request.POST:
@@ -167,12 +170,15 @@ def buy(request, idP, resolution):
         if form.is_valid():
     
             cd = form.cleaned_data
-	    subject = a.subject
+	    subject_to = a.subject_to
 	    email_from = a.email
 	    email_to = cd['Email']
 	    country = cd['Country']
-	    adress = cd['Adress']
-	    index = cd['Index']
+	    street1 = cd['Address1']
+	    street2 = cd['Address2']
+	    city = cd['City']
+ 	    state = cd['State']
+	    zip_code = cd['Index']
 	    f_name = cd['FirstName']
 	    l_name = cd['LastName']
 	    price = pr.price
@@ -182,7 +188,7 @@ def buy(request, idP, resolution):
 	    post_url =  photo_id.post_url 
  	   
 	    order = Order(name= l_name + u" " + f_name,
-			  adress = country + u", " + adress + u", " + index,
+			  adress = street1 + u", " + street2 + u", " + city + u", " + state + u", " + country + u", " + zip_code,
 			  photo_id = image_url,
 			  price = price,
 			  size = size,
@@ -190,18 +196,25 @@ def buy(request, idP, resolution):
 			)
             order.save()       
 	    idorder = order.id
-	    orderref = u'loc.vashchenko.com/order/' +   str(idorder) + u'/'
+	    orderref = codepage + u'/order/' +   str(idorder) + u'/'
    
-            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "adress": adress, "index": index, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
-	    messages = t.render(c)
-	    subjectmessages = s.render(c)
+            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "street1": street1, "street2": street2, "city":city, "state": state,  "zip_code": zip_code, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
 	    
-	    
-	    html_content = t.render(c) 
-	    msg = EmailMessage(subject, html_content, email_from, [email_to]) 
-	    msg.content_subtype = "html"  # Main content is now text/html
+	    message_from = t_from.render(c)
+	    subjectmessage_from = s_from.render(c)
+
+	    message_to = t_to.render(c)
+	    subjectmessage_to = s_to.render(c)
+	
+	    msg_from= EmailMessage(subjectmessage_from, message_from, email_from, [email_to]) 
+	    msg_from.content_subtype = "html"  # Main content is now text/html
 	   
-	    msg.send()
+	    msg_from.send()
+
+	    msg_to = EmailMessage(subjectmessage_to, message_to, email_from, [email_from]) 
+	    msg_to.content_subtype = "html"  # Main content is now text/html
+	   
+	    msg_to.send()
     
  #           send_mail(
  #               subject,
@@ -212,11 +225,11 @@ def buy(request, idP, resolution):
  #          )
 		
 
-            return HttpResponseRedirect('/about/')
+            return HttpResponseRedirect('/preview/' + str(idP))
     else:
-        form = buyForm( # initial={'subject': 'I love your site!'}
-			     )
+        form = buyForm()
     return render_to_response('buy.html', {'form': form, 'buy':a, 'album_list':al }, context_instance=RequestContext(request))
+ 
  
 
 
