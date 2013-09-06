@@ -16,6 +16,7 @@ from django.core.mail      import EmailMultiAlternatives
 from django.core.mail      import EmailMessage
 from django.conf      import settings
 from email.MIMEImage      import MIMEImage
+from config             import ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
 import gdata.photos.service
 import gdata.media
 import gdata.geo
@@ -246,6 +247,15 @@ def preview(request, idP ):
         raise Http404
     return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })
 
+def preview_best(request, photoId):
+    try:
+        photoId = int(photoId)
+        photo = BestPhoto.objects.get( id = photoId )
+        al = Album.objects.all()
+        prices = Price.objects.all()
+    except Post.DoesNotExist:
+        raise Http404
+    return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })   
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
 #--------------------------------------------------------------------------------------------------
@@ -419,8 +429,8 @@ def get_best_photo():
     
 def update_best_photos():
     gd_client = gdata.photos.service.PhotosService()
-    gd_client.email = 'artemhodeev@gmail.com'
-    gd_client.password = 'artemij92'
+    gd_client.email = ACCOUNT_EMAIL
+    gd_client.password = ACCOUNT_PASSWORD
     gd_client.ProgrammaticLogin()
     photos_from_account = []
     photos_from_db=[]
@@ -443,7 +453,7 @@ def update_best_photos():
 
     # get photos from account
     for album in albums.entry:
-        if album.title.text == "happy":
+        if album.title.text == BEST_PHOTO_ALBUM:
             # if album has updated
             #raise Exception, "update.text: %s , album_update: %s" %(album.updated.text,local_album_update)
             if album.updated.text != local_album_update:
@@ -470,7 +480,8 @@ def update_best_photos():
 
    # raise Exception, "length db is %d" %len(BestPhoto.objects.all()) 
     for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_url )   
+       # photos_from_db.append( el.image_url )  
+	    photos_from_db.append( el ) 
        # raise Exception, "url %s" % el.image_url
     
     return photos_from_db 

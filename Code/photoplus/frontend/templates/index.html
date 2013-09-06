@@ -37,7 +37,7 @@
 					<!-- Carousel items -->
 					<div class="carousel-inner">
 					{% for e in best_photo %}
-						<div class="{% if forloop.first %}active {% endif %}item"><a href="/preview/{{ e.id }}"><img height=1024 class="shadow best-photo" src="{{ e }}" /></a></div>
+						<div class="{% if forloop.first %}active {% endif %}item"><a href="/preview_best/{{ e.id }}"><img height=1024 class="shadow best-photo" src="{{ e.image_url }}" /></a></div>
 					{% endfor %}
 					</div>
 					<!-- Carousel nav -->
