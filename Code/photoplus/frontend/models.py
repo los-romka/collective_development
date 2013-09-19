@@ -2,7 +2,13 @@
 
 
 from django.db import models
-import datetime
+from django.contrib import admin
+from django.forms import CheckboxSelectMultiple
+
+class MyModelAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
 
 
 
@@ -11,10 +17,10 @@ import datetime
 
 class Post ( models.Model ):
 
-    post_title = models.CharField( max_length=35 )
-    renew = models.DateTimeField( 'date of renewal' )
-    image_url = models.CharField( max_length=200 )
-    post_url = models.CharField( max_length=200 )
+	post_title = models.CharField( max_length=35 )
+    	renew = models.DateTimeField( 'date of renewal' )
+   	image_url = models.CharField( max_length=200 )
+    	post_url = models.CharField( max_length=200 )
 
 
 
@@ -22,11 +28,12 @@ class Post ( models.Model ):
 
 class Tag ( models.Model ):
 
-    name = models.CharField( max_length=200 )
-    posts = models.ManyToManyField( Post )
-
-    def __unicode__( self ):
-        return self.name
+	name = models.CharField( max_length=200 )
+	posts = models.ManyToManyField( Post )
+	
+	
+	def __unicode__( self ):
+		return self.name
 
 
 
@@ -35,11 +42,11 @@ class Tag ( models.Model ):
 
 class Album ( models.Model ):
 
-    name = models.CharField( max_length=200 )
-    tags = models.ManyToManyField( Tag )
+	name = models.CharField( max_length=200 )
+	tags = models.ManyToManyField( Tag )
 
-    def __unicode__( self ):
-        return self.name
+	def __unicode__( self ):
+		return self.name
 
 
 
@@ -49,46 +56,39 @@ class Album ( models.Model ):
 
 class Admin ( models.Model ):
 
-    login = models.CharField( max_length=200 )
-    hashpass = models.CharField( max_length=200 )
-    renew = models.DateTimeField( 'date of total renewal' )
+	login = models.CharField( max_length=200 )
+	hashpass = models.CharField( max_length=200 )
+	renew = models.DateTimeField( 'date of total renewal' )
 
 class Author( models.Model ):
 
-    photo_url = models.CharField( max_length=200 )
-    information = models.TextField(max_length=10000)
-    email = models.EmailField()
+	photo_url = models.CharField( max_length=200 )
+	information = models.TextField(max_length=10000)
+	email = models.EmailField()
 
 class Message( models.Model ):
 
-    email = models.EmailField( max_length=200 )
-    subject = models.CharField( max_length=200)
-    information = models.TextField(max_length=10000)
+	email = models.EmailField( max_length=200 )
+	subject = models.CharField( max_length=200)
+	information = models.TextField(max_length=10000)
  
 class Price ( models.Model ):
-    price = models.PositiveSmallIntegerField(max_length=4, default=0)
-    size = models.PositiveSmallIntegerField( max_length=10, default=10 )
-    on = models.PositiveSmallIntegerField( max_length=10, default=10 )
+	price = models.PositiveSmallIntegerField(max_length=4, default=0)
+	size = models.PositiveSmallIntegerField( max_length=10, default=10 )
+ 	on = models.PositiveSmallIntegerField( max_length=10, default=10 )
 
 class Order ( models.Model ):
-    Order_choices = (
-        ('RECEIVED ', 'RECEIVED '),
-        ('SHIPPED  ', 'SHIPPED  '),
-        ('ORDER PROCESSING', 'ORDER PROCESSING'),
-        ('CANCELLED', 'CANCELLED'),
-    )
-    name = models.CharField( max_length=150)
-    adress = models.CharField( max_length=70)
-    photo_id = models.CharField( max_length=200)
-    price = models.PositiveSmallIntegerField(max_length=4, default=0)
-    size = models.CharField( max_length=22)
-    status = models.CharField(max_length=20,choices=Order_choices, default='RECEIVED')
+	Order_choices = (
+	    ('RECEIVED ', 'RECEIVED '),
+	    ('SHIPPED  ', 'SHIPPED  '),
+	    ('ORDER PROCESSING', 'ORDER PROCESSING'),
+	    ('CANCELLED', 'CANCELLED'),
+	)
+	name = models.CharField( max_length=150)
+	adress = models.CharField( max_length=70)
+ 	photo_id = models.CharField( max_length=200)
+	price = models.PositiveSmallIntegerField(max_length=4, default=0)
+	size = models.CharField( max_length=22)
+	status = models.CharField(max_length=20,choices=Order_choices, default='RECEIVED')
 
-class BestPhoto (models.Model):
-    image_url = models.CharField( max_length = 200 )
-
-class LastUpdated (models.Model):
-    last_visit = models.DateTimeField()
-    album_update = models.CharField( max_length = 200 )
-
-                  
+	 		 	

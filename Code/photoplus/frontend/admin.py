@@ -1,19 +1,15 @@
 from django.contrib import admin
 from frontend.models import *
 
+from frontend.models import Tag, MyModelAdmin
 
 
 class AlbumAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Album, AlbumAdmin)
+admin.site.register(Album, MyModelAdmin)
 
 class MessageAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None,		{'fields': ['email']}),
-	('Message to you', 	{'fields': ['subject_to', 'information_to']}),
-        ('Message from you', 	{'fields': ['subject_from', 'information_from']}),
-	]
-
+    pass
 admin.site.register(Message, MessageAdmin)
 
 
@@ -26,10 +22,8 @@ class PriceAdmin(admin.ModelAdmin):
 fields = ('price', ('size', 'on'))
 admin.site.register(Price, PriceAdmin)
 
-class OrderAdmin(admin.ModelAdmin):	
-    list_display = ('name', 'adress', 'photo_id', 'price', 'size', 'status')
-    list_editable = ['status']
-    list_filter = ['status']
-    readonly_fields = ('name', 'adress', 'photo_id', 'price', 'size',)
+class OrderAdmin(admin.ModelAdmin):
+	pass	
+fields = ('status')
 admin.site.register(Order, OrderAdmin)
 
