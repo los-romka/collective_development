@@ -6,25 +6,24 @@ from apiclient.discovery import build
 from frontend.models     import *
 from sys                 import *
 from math                import *
-from django.core.mail      import send_mail
-from django.template       import RequestContext
-from django.http      import HttpResponseRedirect
-from frontend.forms       import ReCaptchaForm
-from frontend.forms       import buyForm
-from frontend.models      import *
-from django.core.mail      import EmailMultiAlternatives
-from django.core.mail      import EmailMessage
-from django.conf      import settings
-from email.MIMEImage      import MIMEImage
-import gdata.photos.service
-import gdata.media
-import gdata.geo
-import cgi
-import datetime
+from django.core.mail 	 import send_mail
+from django.template  	 import RequestContext
+from django.http 	 import HttpResponseRedirect
+from frontend.forms  	 import ReCaptchaForm
+from frontend.forms  	 import buyForm
+from frontend.models 	 import *
+from django.core.mail 	 import EmailMultiAlternatives
+from django.core.mail 	 import EmailMessage
+from django.conf 	 import settings
+from email.MIMEImage 	 import MIMEImage
 
 
 
-LAST_VISIT_TO_ACCOUNT = 0
+
+
+
+
+
 
 # Parsing tag info 
 
@@ -138,11 +137,11 @@ def contact(request):
                 cd['subject'],
                 cd['message'],
                 cd.get('email', a.email), [a.email], fail_silently=False
-                    )
+           	     )
             return HttpResponseRedirect('/about/')
     else:
         form = ReCaptchaForm(  initial={'subject': 'I love your site!'}
-                 )
+			     )
     return render_to_response('contact.html', {'form': form, 'album_list':al}, context_instance=RequestContext(request))
 
 
@@ -150,9 +149,9 @@ def contact(request):
 def buy(request, idP, resolution):    
 
     try:
-        al = Album.objects.all()
+	al = Album.objects.all()
         a = Message.objects.get(id=1)
-        pr = Price.objects.get( id = resolution)
+	pr = Price.objects.get( id = resolution)
         idP = int(idP)
         photo_id = Post.objects.get( id = idP )
     
@@ -168,55 +167,55 @@ def buy(request, idP, resolution):
         if form.is_valid():
     
             cd = form.cleaned_data
-            subject = a.subject
-            email_from = a.email
-            email_to = cd['Email']
-            country = cd['Country']
-            adress = cd['Adress']
-            index = cd['Index']
-            f_name = cd['FirstName']
-            l_name = cd['LastName']
-            price = pr.price
-            size = str(pr.size) + u"*" + str(pr.on)
-            post_title = photo_id.post_title
-            image_url =  photo_id.image_url 
-            post_url =  photo_id.post_url 
-        
-            order = Order(name= l_name + u" " + f_name,
-                  adress = country + u", " + adress + u", " + index,
-                  photo_id = image_url,
-                  price = price,
-                  size = size,
-                  status = 'RECEIVED'
-                )
+	    subject = a.subject
+	    email_from = a.email
+	    email_to = cd['Email']
+	    country = cd['Country']
+	    adress = cd['Adress']
+	    index = cd['Index']
+	    f_name = cd['FirstName']
+	    l_name = cd['LastName']
+	    price = pr.price
+	    size = str(pr.size) + u"*" + str(pr.on)
+	    post_title = photo_id.post_title
+	    image_url =  photo_id.image_url 
+	    post_url =  photo_id.post_url 
+ 	   
+	    order = Order(name= l_name + u" " + f_name,
+			  adress = country + u", " + adress + u", " + index,
+			  photo_id = image_url,
+			  price = price,
+			  size = size,
+			  status = 'RECEIVED'
+			)
             order.save()       
-            idorder = order.id
-            orderref = u'loc.vashchenko.com/order/' +   str(idorder) + u'/'
+	    idorder = order.id
+	    orderref = u'loc.vashchenko.com/order/' +   str(idorder) + u'/'
    
             c = Context({"f_name": f_name, "l_name": l_name, "country": country, "adress": adress, "index": index, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
-            messages = t.render(c)
-            subjectmessages = s.render(c)
-        
-        
-            html_content = t.render(c) 
-            msg = EmailMessage(subject, html_content, email_from, [email_to]) 
-            msg.content_subtype = "html"  # Main content is now text/html
-           
-            msg.send()
-        
-     #           send_mail(
-     #               subject,
-     #               messages,
-     #               email_from, 
-    #        [email_to], 
-    #        fail_silently=False
-     #          )
-            
+	    messages = t.render(c)
+	    subjectmessages = s.render(c)
+	    
+	    
+	    html_content = t.render(c) 
+	    msg = EmailMessage(subject, html_content, email_from, [email_to]) 
+	    msg.content_subtype = "html"  # Main content is now text/html
+	   
+	    msg.send()
+    
+ #           send_mail(
+ #               subject,
+ #               messages,
+ #               email_from, 
+#		[email_to], 
+#		fail_silently=False
+ #          )
+		
 
             return HttpResponseRedirect('/about/')
     else:
         form = buyForm( # initial={'subject': 'I love your site!'}
-                 )
+			     )
     return render_to_response('buy.html', {'form': form, 'buy':a, 'album_list':al }, context_instance=RequestContext(request))
  
 
@@ -348,10 +347,7 @@ def home_page( request, page ):
         al = Album.objects.all()
     except Post.DoesNotExist:
         raise Http404
-    try:
-        best_photo = BestPhoto.objects.order_by('-id')
-    except BestPhoto.DoesNotExist:
-        raise Http404
+    
     num_first = num_first + 1
     num_last = num_first + len(last) - 1
     
@@ -364,26 +360,23 @@ def home_page( request, page ):
 
 def home( request ):
     refresh_db_with_new_data()
-    best_photo = get_best_photo()
     try:
         last = Post.objects.order_by('-renew')[0:10]
         al = Album.objects.all()
     except Post.DoesNotExist:
         raise Http404
-   # if len(best_photo) == 0:
-   #     raise Http404
     
     page = 1
     pages = int(ceil(Post.objects.count() / 10.0))
     paginator = get_paginator_data( page, pages , 2 )
     num_last = len(last)
-    #raise Exception, "url : %s" % best_photo[0]
-    return render_to_response('index.html',{ 'last':last, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
-#'best_photo':best_photo,
+    
+    return render_to_response('index.html',{ 'last':last, 'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
+
 
 def order(request, idOrder):
     try:
-        al = Album.objects.all()
+	al = Album.objects.all()
         orderlast = Order.objects.get(id=idOrder)
         ordersall = Order.objects.filter(name=orderlast.name, adress = orderlast.adress)
 
@@ -391,86 +384,5 @@ def order(request, idOrder):
         raise Http404
     return render_to_response('order.html',{ 'ordersall':ordersall , 'orderlast':orderlast, 'album_list':al })
  
-def get_best_photo():
-    now = datetime.datetime.now()
-    # retrive date time of last visit to account
-    
-    if len(LastUpdated.objects.all()) == 0:
-        last_update = LastUpdated(last_visit = now, album_update = "")
-        last_update.save()
-    
-    last_update = LastUpdated.objects.get(id=1)
-    local_last_visit = last_update.last_visit
 
-    
-    photos_from_db = []
-   
-    # get photos from db
-    for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_url )
-    
-    if len(photos_from_db) == 0 or abs(local_last_visit.hour - now.hour) >= 3 or abs(local_last_visit.day - now.day) >= 1:
-        # update last visit in db        
-        last_update.last_visit = now
-        last_update.save()
-        photos_from_db = update_best_photos()
-   
-    return photos_from_db
-    
-def update_best_photos():
-    gd_client = gdata.photos.service.PhotosService()
-    gd_client.email = 'artemhodeev@gmail.com'
-    gd_client.password = 'artemij92'
-    gd_client.ProgrammaticLogin()
-    photos_from_account = []
-    photos_from_db=[]
 
-    # retrive datetime (type is string )of last visit to account
-    last_update = LastUpdated.objects.get(id=1)
-    local_album_update = last_update.album_update
-
-    update_date = 0 # best photos album's update time 
-    act_list = []
-    #last_update = 0 # best photos album's update time. It is taked from last photo info from db
-
-    # get photos from db
-   
-      
-    albums = gd_client.GetUserFeed()
-    
-    for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_url ) 
-
-    # get photos from account
-    for album in albums.entry:
-        if album.title.text == "happy":
-            # if album has updated
-            #raise Exception, "update.text: %s , album_update: %s" %(album.updated.text,local_album_update)
-            if album.updated.text != local_album_update:
-                #update the album_update value in db
-                last_update.album_update = album.updated.text
-                last_update.save()
-                
-                photos = gd_client.GetFeed('/data/feed/api/user/%s/albumid/%s?kind=photo' % ('default', album.gphoto_id.text)) 
-                #get all photos from account
-                for photo in photos.entry:
-                    photos_from_account.append(photo.content.src)
-                    #raise Exception, "src is %s" %len(photo.content.src)
-                for el in BestPhoto.objects.all():
-                    if el.image_url not in photos_from_account:
-                        el.delete() 
-  
-    # compaire photos from account and db: if the photo from account is absent indb, then the photo is added into db
-    for element in photos_from_account:
-        if element not in photos_from_db:
-            p = BestPhoto( image_url = element)
-            p.save()
-
-    photos_from_db = []
-
-   # raise Exception, "length db is %d" %len(BestPhoto.objects.all()) 
-    for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_url )   
-       # raise Exception, "url %s" % el.image_url
-    
-    return photos_from_db 
