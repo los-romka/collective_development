@@ -1,96 +1,92 @@
-<!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link rel='icon' href="/static/frontend/img/pcam-ico.png" type='image/x-icon'>
-		<title>Vashchenko.com</title>
-		<link type="text/css" href="/static/frontend/css/main.css" rel="stylesheet">
-		<link media="screen" href="/static/frontend/css/bootstrap/css/bootstrap.css" rel="stylesheet">
-	</head>
-	<body>
-		<div class="container">
-			<div class="navbar">
-				<div class="navbar-inner">
-					<a class="brand" title="Vashchenko photo bucket" href="/"><img src="/static/frontend/img/logo.png" /></a>
-
-					<ul class="nav">
-						<div class="span1"></div>
-						<li class="active"><a href="/">HOME</a></li>
-						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">GALLERY</a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                {% for e in album_list %}
-									<li>
-										<a tabindex="-1" href="/albums/{{e.name}}">{{e.name}}</a>
-									</li>
-                                {% endfor %}
-							</ul>
-                        </li>
-                        <li><a href="/about/">ABOUT</a></li>
-                   </ul>
-                </div>
-            </div>
-            
-			<div id="content">     
+{% extends "header.html" %}
+{% block page %}
+	{% block content %}  
+<div id="content">     
   <fieldset>
- <legend>
-         <h2>Leave feedback</h2>
- </legend>
-
-    <form action="" method="post">
-        <div class="field">
-            {% if form.subject.errors %}
-            	<label style="color: red;", for="id_subject">Subject:</label>	  
-	   {% else %}
-		<label style="color: black;", for="id_subject">Subject:</label> 	
-	   {% endif %}
-            {{ form.subject }}
-        </div>
  
-        <div class="field">
+         <legend>
+		<h2>Leave feedback</h2>
+	</legend>
+ 
+
+    <form class="form-horizontal" action="" method="post">
+        <div >
+            {% if form.subject.errors %}
+            	<div class="control-group error">
+  			<label class="control-label" for="inputError">Subject</label>
+  			<div class="controls">
+    			{{ form.subject }}
+    			<span class="help-inline">*</span>
+  			</div>	  
+	   {% else %}
+		 <div class="control-group success">
+			  <label class="control-label" for="inputSuccess">Subject</label>
+			  <div class="controls">
+			    {{ form.subject }}
+			    <span class="help-inline">*</span>
+			  </div>
+		</div>
+	   {% endif %}
+        </div>
+ 	<div >
             {% if form.email.errors %}
-          	 <label style="color: red;" , for="id_email">Your e-mail:</label>
- 	   {% else %}
-		 <label style="color: black;" , for="id_email">Your e-mail:</label>
+            	<div class="control-group error">
+  			<label class="control-label" for="inputError">Email</label>
+  			<div class="controls">
+    			 {{ form.email }}
+			<span class="help-inline">*</span>
+  			</div>	  
+	   {% else %}
+		 <div class="control-group success">
+			  <label class="control-label" for="inputSuccess">Email</label>
+			  <div class="controls">
+			    {{ form.email }}
+			    <span class="help-inline">*</span>
+			  </div>
+		</div>
 	   {% endif %}
-            {{ form.email }}
         </div>
-        <div class="field">
+	<div >
             {% if form.message.errors %}
-                 <label style="color: red;" , for="id_message">Message:</label>
-	    {% else %}
-		 <label style="color: black;" , for="id_message">Message:</label>
+            	<div class="control-group error">
+  			<label class="control-label" for="inputError">Message</label>
+  			<div class="controls">
+    			{{ form.message }}
+			<span class="help-inline">*</span>
+  			</div>	  
+	   {% else %}
+		 <div class="control-group success">
+			  <label class="control-label" for="inputSuccess">Message</label>
+			  <div class="controls">
+			    {{ form.message }}
+			   <span class="help-inline">*</span>
+			  </div>
+		</div>
 	   {% endif %}
-            {{ form.message }}
         </div>
-	<div class="field">
-	   {% if form.captcha.errors %}
-          	 <label style="color: red;" , for="id_email">Code in the image:</label>
- 	   {% else %}
-		 <label style="color: black;" , for="id_email">Code in the image:</label>
+	<div >
+            {% if form.captcha.errors %}
+            	<div class="control-group error">
+  			<label class="control-label" for="inputError">Code in the image</label>
+  			<div class="controls">
+    			{{ form.captcha }}
+  			</div>	  
+	   {% else %}
+		 <div class="control-group success">
+			  <label class="control-label" for="inputSuccess">Code in the image</label>
+			  <div class="controls">
+			    {{ form.captcha }}
+			  </div>
+		</div>
 	   {% endif %}
-            {{ form.captcha }} 
-	</div>
-  </fieldset>
-        <input id="submit" type="submit" value="Submit">
+        </div>
+        
+  
+        	 <div class="controls">
+			<input class="btn" id="submit" type="submit" value="Submit">
+		</div>
     </form>
    </div>
-	<div id="blank-footer">
-			</div>
-			<div id="footer">
-				<hr />
-				<span class="muted">Yuri Vashchenko. All rights reserved</span>
-			</div>
-		</div>
-		<script>
-			$('.nav').children('.dropdown').hover(
-			function(){
-			$(this).addClass('open');
-			},
-			function(){
-			$(this).removeClass('open');
-			});
-		</script>
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
-		<script src="/static/frontend/css/bootstrap/js/bootstrap.js"></script>
-	</body>       
-</html>
+</fieldset>
+	{% endblock %}
+{% endblock %}
