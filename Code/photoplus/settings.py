@@ -14,7 +14,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'photoplus',            
         'USER': 'root',           
-        'PASSWORD': '123456',             
+        'PASSWORD': '1',             
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -29,9 +29,11 @@ USE_TZ = True
 
 
 MEDIA_ROOT = ''
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
+
 
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -72,6 +74,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '/srv/www/photoplus/templates'
+    '/srv/www/photoplus/frontend/templates'
 )
 
 INSTALLED_APPS = (
