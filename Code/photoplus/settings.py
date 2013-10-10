@@ -14,7 +14,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'photoplus',            
         'USER': 'root',           
-        'PASSWORD': '123456',             
+        'PASSWORD': '1',             
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -29,7 +29,8 @@ USE_TZ = True
 
 
 MEDIA_ROOT = ''
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
@@ -37,6 +38,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+   
 )
 
 STATICFILES_FINDERS = (
@@ -72,6 +74,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '/srv/www/photoplus/templates'
+    '/srv/www/photoplus/frontend/templates'
 )
 
 INSTALLED_APPS = (
@@ -119,11 +123,11 @@ LOGGING = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'LOGIN'
+DEFAULT_FROM_EMAIL = ''
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'LOGIN'
-EMAIL_HOST_PASSWORD = 'PASSWORD'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
 
 #EMAIL_HOST = 'localhost'
