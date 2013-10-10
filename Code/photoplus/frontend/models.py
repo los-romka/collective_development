@@ -2,7 +2,13 @@
 
 
 from django.db import models
+from django.contrib import admin
+from django.forms import CheckboxSelectMultiple
 
+class MyModelAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
 
 
 
@@ -24,7 +30,8 @@ class Tag ( models.Model ):
 
 	name = models.CharField( max_length=200 )
 	posts = models.ManyToManyField( Post )
-
+	
+	
 	def __unicode__( self ):
 		return self.name
 
@@ -35,7 +42,7 @@ class Tag ( models.Model ):
 
 class Album ( models.Model ):
 
-	name = models.CharField( max_length=200 )
+	name = models.CharField( max_length=200, unique=True )
 	tags = models.ManyToManyField( Tag )
 
 	def __unicode__( self ):
