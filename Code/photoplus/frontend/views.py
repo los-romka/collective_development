@@ -16,10 +16,19 @@ from django.core.mail 	 import EmailMultiAlternatives
 from django.core.mail 	 import EmailMessage
 from django.conf 	 import settings
 from email.MIMEImage 	 import MIMEImage
+from django 		 import template
+from config             import ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
+import gdata.photos.service
+import gdata.media
+import gdata.geo
+import cgi
+import datetime
 
 
+import sys, traceback
 
 
+LAST_VISIT_TO_ACCOUNT = 0
 
 
 
@@ -147,7 +156,6 @@ def contact(request):
 
 
 def buy(request, idP, resolution):    
-
     try:
 	al = Album.objects.all()
         a = Message.objects.get(id=1)
@@ -158,8 +166,12 @@ def buy(request, idP, resolution):
     except Post.DoesNotExist:
         raise Http404
    
-    t = Template(a.information)
-    s = Template(a.subject)
+    t_to = Template(a.information_to) #to you
+    t_from = Template(a.information_from) #from you/ means from admin
+    s_to = Template(a.subject_to)
+    s_from = Template(a.subject_from)
+
+    codepage = request.get_host()
        
     form = buyForm()
     if request.POST:
@@ -167,12 +179,15 @@ def buy(request, idP, resolution):
         if form.is_valid():
     
             cd = form.cleaned_data
-	    subject = a.subject
+	    subject_to = a.subject_to
 	    email_from = a.email
 	    email_to = cd['Email']
 	    country = cd['Country']
-	    adress = cd['Adress']
-	    index = cd['Index']
+	    street1 = cd['Address1']
+	    street2 = cd['Address2']
+	    city = cd['City']
+ 	    state = cd['State']
+	    zip_code = cd['Index']
 	    f_name = cd['FirstName']
 	    l_name = cd['LastName']
 	    price = pr.price
@@ -182,7 +197,7 @@ def buy(request, idP, resolution):
 	    post_url =  photo_id.post_url 
  	   
 	    order = Order(name= l_name + u" " + f_name,
-			  adress = country + u", " + adress + u", " + index,
+			  adress = street1 + u", " + street2 + u", " + city + u", " + state + u", " + country + u", " + zip_code,
 			  photo_id = image_url,
 			  price = price,
 			  size = size,
@@ -190,32 +205,29 @@ def buy(request, idP, resolution):
 			)
             order.save()       
 	    idorder = order.id
-	    orderref = u'loc.vashchenko.com/order/' +   str(idorder) + u'/'
+	    orderref = codepage + u'/order/' +   str(idorder) + u'/'
    
-            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "adress": adress, "index": index, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
-	    messages = t.render(c)
-	    subjectmessages = s.render(c)
+            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "street1": street1, "street2": street2, "city":city, "state": state,  "zip_code": zip_code, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
 	    
-	    
-	    html_content = t.render(c) 
-	    msg = EmailMessage(subject, html_content, email_from, [email_to]) 
-	    msg.content_subtype = "html"  # Main content is now text/html
-	   
-	    msg.send()
-    
- #           send_mail(
- #               subject,
- #               messages,
- #               email_from, 
-#		[email_to], 
-#		fail_silently=False
- #          )
-		
+	    message_from = t_from.render(c)
+	    subjectmessage_from = s_from.render(c)
 
-            return HttpResponseRedirect('/about/')
+	    message_to = t_to.render(c)
+	    subjectmessage_to = s_to.render(c)
+	
+	    msg_from= EmailMessage(subjectmessage_from, message_from, email_from, [email_to]) 
+	    msg_from.content_subtype = "html"  # Main content is now text/html
+	   
+	    msg_from.send()
+
+	    msg_to = EmailMessage(subjectmessage_to, message_to, email_from, [email_from]) 
+	    msg_to.content_subtype = "html"  # Main content is now text/html
+	   
+	    msg_to.send()
+
+            return HttpResponseRedirect('/preview/' + str(idP))
     else:
-        form = buyForm( # initial={'subject': 'I love your site!'}
-			     )
+        form = buyForm()
     return render_to_response('buy.html', {'form': form, 'buy':a, 'album_list':al }, context_instance=RequestContext(request))
  
 
@@ -244,6 +256,16 @@ def preview(request, idP ):
     except Post.DoesNotExist:
         raise Http404
     return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })
+
+def preview_best(request, photoId):
+    try:
+        photoId = int(photoId)
+        photo = BestPhoto.objects.get( id = photoId )
+        al = Album.objects.all()
+        prices = Price.objects.all()
+    except Post.DoesNotExist:
+        raise Http404
+    return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })  
 
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
@@ -360,6 +382,7 @@ def home_page( request, page ):
 
 def home( request ):
     refresh_db_with_new_data()
+    refresh_db_with_new_data()
     try:
         last = Post.objects.order_by('-renew')[0:10]
         al = Album.objects.all()
@@ -371,7 +394,12 @@ def home( request ):
     paginator = get_paginator_data( page, pages , 2 )
     num_last = len(last)
     
-    return render_to_response('index.html',{ 'last':last, 'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
+    return render_to_response('index.html',{ 'last':last, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
+
+def change_albums_name(album_name):
+    album_name.strip()
+    album_name.replace(' ', '-')
+    return album_name
 
 
 def order(request, idOrder):
@@ -383,6 +411,93 @@ def order(request, idOrder):
     except Post.DoesNotExist:
         raise Http404
     return render_to_response('order.html',{ 'ordersall':ordersall , 'orderlast':orderlast, 'album_list':al })
+
+
+def get_best_photo():
+    now = datetime.datetime.now()
+    # retrive date time of last visit to account
+    
+    if len(LastUpdated.objects.all()) == 0:
+        last_update = LastUpdated(last_visit = now, album_update = "")
+        last_update.save()
+    
+    last_update = LastUpdated.objects.get(id=1)
+    local_last_visit = last_update.last_visit
+
+    
+    photos_from_db = []
+   
+    # get photos from db
+    for el in BestPhoto.objects.all():
+        photos_from_db.append( el.image_url )
+    
+    if len(photos_from_db) == 0 or abs(local_last_visit.hour - now.hour) >= 3 or abs(local_last_visit.day - now.day) >= 1:
+        # update last visit in db        
+        last_update.last_visit = now
+        last_update.save()
+        photos_from_db = update_best_photos()
+   
+    return photos_from_db
+    
+def update_best_photos():
+    gd_client = gdata.photos.service.PhotosService()
+    gd_client.email = ACCOUNT_EMAIL
+    gd_client.password = ACCOUNT_PASSWORD
+    gd_client.ProgrammaticLogin()
+    photos_from_account = []
+    photos_from_db=[]
+
+    # retrive datetime (type is string )of last visit to account
+    last_update = LastUpdated.objects.get(id=1)
+    local_album_update = last_update.album_update
+
+    update_date = 0 # best photos album's update time 
+    act_list = []
+    #last_update = 0 # best photos album's update time. It is taked from last photo info from db
+
+    # get photos from db
+   
+      
+    albums = gd_client.GetUserFeed()
+    
+    for el in BestPhoto.objects.all():
+        photos_from_db.append( el.image_url ) 
+
+    # get photos from account
+    for album in albums.entry:
+        if album.title.text == BEST_PHOTO_ALBUM:
+            # if album has updated
+            #raise Exception, "update.text: %s , album_update: %s" %(album.updated.text,local_album_update)
+            if album.updated.text != local_album_update:
+                #update the album_update value in db
+                last_update.album_update = album.updated.text
+                last_update.save()
+                
+                photos = gd_client.GetFeed('/data/feed/api/user/%s/albumid/%s?kind=photo' % ('default', album.gphoto_id.text)) 
+                #get all photos from account
+                for photo in photos.entry:
+                    photos_from_account.append(photo.content.src)
+                    #raise Exception, "src is %s" %len(photo.content.src)
+                for el in BestPhoto.objects.all():
+                    if el.image_url not in photos_from_account:
+                        el.delete() 
+  
+    # compaire photos from account and db: if the photo from account is absent indb, then the photo is added into db
+    for element in photos_from_account:
+        if element not in photos_from_db:
+            p = BestPhoto( image_url = element)
+            p.save()
+
+    photos_from_db = []
+
+   # raise Exception, "length db is %d" %len(BestPhoto.objects.all()) 
+    for el in BestPhoto.objects.all():
+       # photos_from_db.append( el.image_url )  
+	    photos_from_db.append( el ) 
+       # raise Exception, "url %s" % el.image_url
+    
+    return photos_from_db 
+
  
 
 
