@@ -39,6 +39,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+   
 )
 
 STATICFILES_FINDERS = (
@@ -123,11 +124,11 @@ LOGGING = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'LOGIN'
+DEFAULT_FROM_EMAIL = ''
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'LOGIN'
-EMAIL_HOST_PASSWORD = 'PASSWORD'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
 
 #EMAIL_HOST = 'localhost'
