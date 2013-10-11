@@ -16,6 +16,7 @@ from django.core.mail      import EmailMultiAlternatives
 from django.core.mail      import EmailMessage
 from django.conf      import settings
 from email.MIMEImage      import MIMEImage
+from django          import template
 from config             import ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
 import gdata.photos.service
 import gdata.media
@@ -24,8 +25,14 @@ import cgi
 import datetime
 
 
+import sys, traceback
+
 
 LAST_VISIT_TO_ACCOUNT = 0
+
+
+
+
 
 # Parsing tag info 
 
@@ -149,19 +156,22 @@ def contact(request):
 
 
 def buy(request, idP, resolution):    
-
     try:
-        al = Album.objects.all()
+    al = Album.objects.all()
         a = Message.objects.get(id=1)
-        pr = Price.objects.get( id = resolution)
+    pr = Price.objects.get( id = resolution)
         idP = int(idP)
         photo_id = Post.objects.get( id = idP )
     
     except Post.DoesNotExist:
         raise Http404
    
-    t = Template(a.information)
-    s = Template(a.subject)
+    t_to = Template(a.information_to) #to you
+    t_from = Template(a.information_from) #from you/ means from admin
+    s_to = Template(a.subject_to)
+    s_from = Template(a.subject_from)
+
+    codepage = request.get_host()
        
     form = buyForm()
     if request.POST:
@@ -169,55 +179,55 @@ def buy(request, idP, resolution):
         if form.is_valid():
     
             cd = form.cleaned_data
-            subject = a.subject
-            email_from = a.email
-            email_to = cd['Email']
-            country = cd['Country']
-            adress = cd['Adress']
-            index = cd['Index']
-            f_name = cd['FirstName']
-            l_name = cd['LastName']
-            price = pr.price
-            size = str(pr.size) + u"*" + str(pr.on)
-            post_title = photo_id.post_title
-            image_url =  photo_id.image_url 
-            post_url =  photo_id.post_url 
+        subject_to = a.subject_to
+        email_from = a.email
+        email_to = cd['Email']
+        country = cd['Country']
+        street1 = cd['Address1']
+        street2 = cd['Address2']
+        city = cd['City']
+         state = cd['State']
+        zip_code = cd['Index']
+        f_name = cd['FirstName']
+        l_name = cd['LastName']
+        price = pr.price
+        size = str(pr.size) + u"*" + str(pr.on)
+        post_title = photo_id.post_title
+        image_url =  photo_id.image_url 
+        post_url =  photo_id.post_url 
         
-            order = Order(name= l_name + u" " + f_name,
-                  adress = country + u", " + adress + u", " + index,
-                  photo_id = image_url,
-                  price = price,
-                  size = size,
-                  status = 'RECEIVED'
-                )
+        order = Order(name= l_name + u" " + f_name,
+              adress = street1 + u", " + street2 + u", " + city + u", " + state + u", " + country + u", " + zip_code,
+              photo_id = image_url,
+              price = price,
+              size = size,
+              status = 'RECEIVED'
+            )
             order.save()       
-            idorder = order.id
-            orderref = u'loc.vashchenko.com/order/' +   str(idorder) + u'/'
+        idorder = order.id
+        orderref = codepage + u'/order/' +   str(idorder) + u'/'
    
-            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "adress": adress, "index": index, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
-            messages = t.render(c)
-            subjectmessages = s.render(c)
+            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "street1": street1, "street2": street2, "city":city, "state": state,  "zip_code": zip_code, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
         
-        
-            html_content = t.render(c) 
-            msg = EmailMessage(subject, html_content, email_from, [email_to]) 
-            msg.content_subtype = "html"  # Main content is now text/html
-           
-            msg.send()
-        
-     #           send_mail(
-     #               subject,
-     #               messages,
-     #               email_from, 
-    #        [email_to], 
-    #        fail_silently=False
-     #          )
-            
+        message_from = t_from.render(c)
+        subjectmessage_from = s_from.render(c)
 
-            return HttpResponseRedirect('/about/')
+        message_to = t_to.render(c)
+        subjectmessage_to = s_to.render(c)
+    
+        msg_from= EmailMessage(subjectmessage_from, message_from, email_from, [email_to]) 
+        msg_from.content_subtype = "html"  # Main content is now text/html
+       
+        msg_from.send()
+
+        msg_to = EmailMessage(subjectmessage_to, message_to, email_from, [email_from]) 
+        msg_to.content_subtype = "html"  # Main content is now text/html
+       
+        msg_to.send()
+
+            return HttpResponseRedirect('/preview/' + str(idP))
     else:
-        form = buyForm( # initial={'subject': 'I love your site!'}
-                 )
+        form = buyForm()
     return render_to_response('buy.html', {'form': form, 'buy':a, 'album_list':al }, context_instance=RequestContext(request))
  
 
@@ -255,7 +265,8 @@ def preview_best(request, photoId):
         prices = Price.objects.all()
     except Post.DoesNotExist:
         raise Http404
-    return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })   
+    return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })  
+
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
 #--------------------------------------------------------------------------------------------------
@@ -358,10 +369,7 @@ def home_page( request, page ):
         al = Album.objects.all()
     except Post.DoesNotExist:
         raise Http404
-    try:
-        best_photo = BestPhoto.objects.order_by('-id')
-    except BestPhoto.DoesNotExist:
-        raise Http404
+    
     num_first = num_first + 1
     num_last = num_first + len(last) - 1
     
@@ -374,33 +382,38 @@ def home_page( request, page ):
 
 def home( request ):
     refresh_db_with_new_data()
-    best_photo = get_best_photo()
+    refresh_db_with_new_data()
     try:
         last = Post.objects.order_by('-renew')[0:10]
+        best_photo = get_best_photo()
         al = Album.objects.all()
     except Post.DoesNotExist:
         raise Http404
-   # if len(best_photo) == 0:
-   #     raise Http404
     
     page = 1
     pages = int(ceil(Post.objects.count() / 10.0))
     paginator = get_paginator_data( page, pages , 2 )
     num_last = len(last)
-    #raise Exception, "url : %s" % best_photo[0]
+    
     return render_to_response('index.html',{ 'last':last, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
-#'best_photo':best_photo,
+
+def change_albums_name(album_name):
+    album_name.strip()
+    album_name.replace(' ', '-')
+    return album_name
+
 
 def order(request, idOrder):
     try:
-        al = Album.objects.all()
+    al = Album.objects.all()
         orderlast = Order.objects.get(id=idOrder)
         ordersall = Order.objects.filter(name=orderlast.name, adress = orderlast.adress)
 
     except Post.DoesNotExist:
         raise Http404
     return render_to_response('order.html',{ 'ordersall':ordersall , 'orderlast':orderlast, 'album_list':al })
- 
+
+
 def get_best_photo():
     now = datetime.datetime.now()
     # retrive date time of last visit to account
@@ -481,7 +494,11 @@ def update_best_photos():
    # raise Exception, "length db is %d" %len(BestPhoto.objects.all()) 
     for el in BestPhoto.objects.all():
        # photos_from_db.append( el.image_url )  
-	    photos_from_db.append( el ) 
+        photos_from_db.append( el ) 
        # raise Exception, "url %s" % el.image_url
     
     return photos_from_db 
+
+ 
+
+
