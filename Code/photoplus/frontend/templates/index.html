@@ -8,7 +8,11 @@
 					<!-- Carousel items -->
 					<div class="carousel-inner">
 					{% for e in best_photo %}
+<<<<<<< HEAD
 						<div class="{% if forloop.first %}active {% endif %}item"><a href="/preview_best/{{ e.id }}"><img WIDTH=1020 id="best_photo" style="margin-left: 10px; margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" class="shadow best-photo" src="{{ e.image_url }}" /></a></div>
+=======
+						<div class="{% if forloop.first %}active {% endif %}item"><a href="/preview_best/{{ e.id }}"><img WIDTH=1020 style="margin-left: 10px; margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" class="shadow best-photo" src="{{ e.image_url }}" /></a></div>
+>>>>>>> master
 					{% endfor %}
 					</div>
 					<!-- Carousel nav -->

@@ -6,6 +6,7 @@ from apiclient.discovery import build
 from frontend.models     import *
 from sys                 import *
 from math                import *
+<<<<<<< HEAD
 from django.core.mail      import send_mail
 from django.template       import RequestContext
 from django.http      import HttpResponseRedirect
@@ -17,6 +18,19 @@ from django.core.mail      import EmailMessage
 from django.conf      import settings
 from email.MIMEImage      import MIMEImage
 from django          import template
+=======
+from django.core.mail 	 import send_mail
+from django.template  	 import RequestContext
+from django.http 	 import HttpResponseRedirect
+from frontend.forms  	 import ReCaptchaForm
+from frontend.forms  	 import buyForm
+from frontend.models 	 import *
+from django.core.mail 	 import EmailMultiAlternatives
+from django.core.mail 	 import EmailMessage
+from django.conf 	 import settings
+from email.MIMEImage 	 import MIMEImage
+from django 		 import template
+>>>>>>> master
 from config             import ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
 import gdata.photos.service
 import gdata.media
@@ -146,20 +160,26 @@ def contact(request):
                 cd['subject'],
                 cd['message'],
                 cd.get('email', a.email), [a.email], fail_silently=False
-                    )
+           	     )
             return HttpResponseRedirect('/about/')
     else:
         form = ReCaptchaForm(  initial={'subject': 'I love your site!'}
-                 )
+			     )
     return render_to_response('contact.html', {'form': form, 'album_list':al}, context_instance=RequestContext(request))
 
 
 
 def buy(request, idP, resolution):    
     try:
+<<<<<<< HEAD
     al = Album.objects.all()
         a = Message.objects.get(id=1)
     pr = Price.objects.get( id = resolution)
+=======
+	al = Album.objects.all()
+        a = Message.objects.get(id=1)
+	pr = Price.objects.get( id = resolution)
+>>>>>>> master
         idP = int(idP)
         photo_id = Post.objects.get( id = idP )
     
@@ -179,6 +199,7 @@ def buy(request, idP, resolution):
         if form.is_valid():
     
             cd = form.cleaned_data
+<<<<<<< HEAD
         subject_to = a.subject_to
         email_from = a.email
         email_to = cd['Email']
@@ -224,6 +245,53 @@ def buy(request, idP, resolution):
         msg_to.content_subtype = "html"  # Main content is now text/html
        
         msg_to.send()
+=======
+	    subject_to = a.subject_to
+	    email_from = a.email
+	    email_to = cd['Email']
+	    country = cd['Country']
+	    street1 = cd['Address1']
+	    street2 = cd['Address2']
+	    city = cd['City']
+ 	    state = cd['State']
+	    zip_code = cd['Index']
+	    f_name = cd['FirstName']
+	    l_name = cd['LastName']
+	    price = pr.price
+	    size = str(pr.size) + u"*" + str(pr.on)
+	    post_title = photo_id.post_title
+	    image_url =  photo_id.image_url 
+	    post_url =  photo_id.post_url 
+ 	   
+	    order = Order(name= l_name + u" " + f_name,
+			  adress = street1 + u", " + street2 + u", " + city + u", " + state + u", " + country + u", " + zip_code,
+			  photo_id = image_url,
+			  price = price,
+			  size = size,
+			  status = 'RECEIVED'
+			)
+            order.save()       
+	    idorder = order.id
+	    orderref = codepage + u'/order/' +   str(idorder) + u'/'
+   
+            c = Context({"f_name": f_name, "l_name": l_name, "country": country, "street1": street1, "street2": street2, "city":city, "state": state,  "zip_code": zip_code, "price": price, "size": size, "post_title":post_title, "image_url":image_url, "post_url": post_url, "orderref": orderref, "idorder": idorder })
+	    
+	    message_from = t_from.render(c)
+	    subjectmessage_from = s_from.render(c)
+
+	    message_to = t_to.render(c)
+	    subjectmessage_to = s_to.render(c)
+	
+	    msg_from= EmailMessage(subjectmessage_from, message_from, email_from, [email_to]) 
+	    msg_from.content_subtype = "html"  # Main content is now text/html
+	   
+	    msg_from.send()
+
+	    msg_to = EmailMessage(subjectmessage_to, message_to, email_from, [email_from]) 
+	    msg_to.content_subtype = "html"  # Main content is now text/html
+	   
+	    msg_to.send()
+>>>>>>> master
 
             return HttpResponseRedirect('/preview/' + str(idP))
     else:
@@ -405,7 +473,11 @@ def change_albums_name(album_name):
 
 def order(request, idOrder):
     try:
+<<<<<<< HEAD
     al = Album.objects.all()
+=======
+	al = Album.objects.all()
+>>>>>>> master
         orderlast = Order.objects.get(id=idOrder)
         ordersall = Order.objects.filter(name=orderlast.name, adress = orderlast.adress)
 
@@ -494,7 +566,11 @@ def update_best_photos():
    # raise Exception, "length db is %d" %len(BestPhoto.objects.all()) 
     for el in BestPhoto.objects.all():
        # photos_from_db.append( el.image_url )  
+<<<<<<< HEAD
         photos_from_db.append( el ) 
+=======
+	    photos_from_db.append( el ) 
+>>>>>>> master
        # raise Exception, "url %s" % el.image_url
     
     return photos_from_db 

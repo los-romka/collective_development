@@ -1,35 +1,6 @@
-<!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link rel='icon' href="/static/frontend/img/pcam-ico.png" type='image/x-icon'>
-		<title>Vashchenko.com</title>
-		<link type="text/css" href="/static/frontend/css/main.css" rel="stylesheet">
-		<link media="screen" href="/static/frontend/css/bootstrap/css/bootstrap.css" rel="stylesheet">
-	</head>
-	<body>
-		<div class="container">
-			<div class="navbar">
-				<div class="navbar-inner">
-					<a class="brand" title="Vashchenko photo bucket" href="/"><img src="/static/frontend/img/logo.png" /></a>
-
-					<ul class="nav">
-						<div class="span1"></div>
-						<li class="active"><a href="/">HOME</a></li>
-						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">GALLERY</a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
-                                {% for e in album_list %}
-									<li>
-										<a tabindex="-1" href="/albums/{{e.name}}">{{e.name}}</a>
-									</li>
-                                {% endfor %}
-							</ul>
-                        </li>
-                        <li><a href="/about/">ABOUT</a></li>
-                   </ul>
-                </div>
-            </div>
-            
+{% extends "header.html" %}
+{% block page %}
+	{% block content %}              
 			<div id="content">
 				 <fieldset>
 				 <legend>
@@ -41,7 +12,7 @@
 						<p>Your last order: {{e.id}}</p>
 						<p>Name:            {{e.name}}</p>
 						<p>Adress: 	    {{e.adress}}</p>
-						<p>Photo url:       {{e.photo_id}}</p>
+						<p>Photo url:       <a href="{{e.photo_id}}">{{e.photo_id}}</a></p>
 						<p>Price:           {{e.price}} </p>
 						<p>Size:            {{e.size}}</p>
 						<p>Status:          {{e.status}}</p>
@@ -52,7 +23,7 @@
 <br>
 
 <h3>All orders:</h3>
-<table align="center" padding="7" border="2">
+<table width="550"  align="center" padding="7" border="2">
 	<thead>
 		<tr>
 			<td>Order Id</td>
@@ -71,7 +42,7 @@
 			<td>{{e.id}}</td>
 			<td>{{e.name}}</td>
 			<td>{{e.adress}}</td>
-			<td>{{e.photo_id}}</td>
+			<td><a href="{{e.photo_id}}">{{e.photo_id}}</a></td>
 			<td>{{e.price}}</td>
 			<td>{{e.size}}</td>
 			<td>{{e.status}}</td>
@@ -82,25 +53,5 @@
 
 				
 			 </div>
-	<div id="blank-footer">
-			</div>
-			<div id="footer">
-				<hr />
-				<span class="muted">Yuri Vashchenko. All rights reserved</span>
-			</div>
-		</div>
-		<script>
-			$('.nav').children('.dropdown').hover(
-			function(){
-			$(this).addClass('open');
-			},
-			function(){
-			$(this).removeClass('open');
-			});
-		</script>
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
-		<script src="/static/frontend/css/bootstrap/js/bootstrap.js"></script>
-	</body>
-</html>
-
-
+{% endblock %}
+{% endblock %}

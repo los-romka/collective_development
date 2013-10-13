@@ -100,7 +100,11 @@ class Order ( models.Model ):
 	status = models.CharField(max_length=20,choices=Order_choices, default='RECEIVED')
 
 class BestPhoto (models.Model):
+<<<<<<< HEAD
     image_url = models.CharField( max_length = 1024 )
+=======
+    image_url = models.CharField( max_length = 400 )
+>>>>>>> master
 
 class LastUpdated (models.Model):
     last_visit = models.DateTimeField()

@@ -1,11 +1,12 @@
 from django.contrib import admin
 from frontend.models import *
 
+from frontend.models import Tag, MyModelAdmin
 
 
 class AlbumAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Album, AlbumAdmin)
+admin.site.register(Album, MyModelAdmin)
 
 class MessageAdmin(admin.ModelAdmin):
     fieldsets = [
