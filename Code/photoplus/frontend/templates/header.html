@@ -20,9 +20,7 @@
                                 {% for e in album_list %}
 									
 									<li>
-										<a tabindex="-1" href="/albums/{{e.name}}">{% load cut %}
-
-{{e.name|cut:"_"}}</a>
+										<a tabindex="-1" href="/albums/{{e.id}}">{{e.name}}</a>
 									</li>
                                 {% endfor %}
 							</ul>

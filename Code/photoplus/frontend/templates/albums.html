@@ -25,27 +25,27 @@
 			    <div class="pagination pagination-centered">
 			    	<ul>
 						{% if paginator.has_previous %}
-						<li><a href="/albums/{{ album.name }}/{{ paginator.previous }}/">&lt; Prev</a></li>
+						<li><a href="/albums/{{ album.id }}/{{ paginator.previous }}/">&lt; Prev</a></li>
 						{% else %}
 						<li class="disabled"><a>&lt; Prev</a></li>
 						{% endif %}
 						{% if paginator.show_first %}
-						<li><a href="/albums/{{ album.name }}/1/">1</a></li>
+						<li><a href="/albums/{{ album.id }}/1/">1</a></li>
 						<li class="disabled"><a>...</a></li>
 						{% endif %}
 						{% for linkpage in paginator.page_numbers %}
                             {% ifequal linkpage paginator.page %}
 							<li class="active"><a>{{ paginator.page }}</a></li>
 							{% else %}
-							<li><a href="/albums/{{ album.name }}/{{ linkpage }}/">{{ linkpage }}</a></li>
+							<li><a href="/albums/{{ album.id }}/{{ linkpage }}/">{{ linkpage }}</a></li>
 							{% endifequal %}
 						{% endfor %}
 						{% if paginator.show_last %}
                         <li class="disabled"><a>...</a></li>
-						<li><a href="/albums/{{ album.name }}/{{ paginator.pages }}/">{{ paginator.pages }}</a></li>
+						<li><a href="/albums/{{ album.id }}/{{ paginator.pages }}/">{{ paginator.pages }}</a></li>
                         {% endif %}
 						{% if paginator.has_next %}
-						<li><a href="/albums/{{ album.name }}/{{ paginator.next }}/">Next &gt;</a></li>
+						<li><a href="/albums/{{ album.id }}/{{ paginator.next }}/">Next &gt;</a></li>
 						{% else %}
 						<li class="disabled"><a>Next &gt;</a></li>
 						{% endif %}

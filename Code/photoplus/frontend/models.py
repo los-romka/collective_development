@@ -50,8 +50,8 @@ class Album ( models.Model ):
 
     def save(self):
         self.name = self.name.strip()
-        self.name = self.name.replace(' ', '_')
-        self.name = self.name.replace('-', '_')
+        while "  " in self.name:
+		self.name = self.name.replace("  ", ' ')
         super(Album, self).save() 
 
 

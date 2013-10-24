@@ -327,14 +327,14 @@ def strip_title( text ):
 #--------------------------------------------------------------------------------------------------
 #                                       DESCRIBE_ALBUM
 #--------------------------------------------------------------------------------------------------
-def album( request , idA = "default", page = 1):
+def album( request , idA, page = 1):
     
     page = int(page)
     
     if (page < 1):
         raise Http404
     try:
-        album = Album.objects.get( name = idA)
+        album = Album.objects.get( id = idA)
         al = Album.objects.all()
 
         photos = []
@@ -386,7 +386,7 @@ def home_page( request, page ):
 
 def home( request ):
     refresh_db_with_new_data()
-    refresh_db_with_new_data()
+ 
     try:
         last = Post.objects.order_by('-renew')[0:10]
         best_photo = get_best_photo()
@@ -401,10 +401,7 @@ def home( request ):
     
     return render_to_response('index.html',{ 'last':last, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
 
-def change_albums_name(album_name):
-    album_name.strip()
-    album_name.replace(' ', '-')
-    return album_name
+
 
 
 def order(request, idOrder):

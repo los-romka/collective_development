@@ -24,8 +24,8 @@ urlpatterns = patterns('',
     url(r'^about/$', about),
     url(r'^order/(?P<idOrder>\d+)/$', order),
     
-    url(r'^albums/(?P<idA>\w+)/$', album),
-    url(r'^albums/(?P<idA>\w+)/(?P<page>\d+)/$', album),
+    url(r'^albums/(?P<idA>\d+)/$', album),
+    url(r'^albums/(?P<idA>\d+)/(?P<page>\d+)/$', album),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:
