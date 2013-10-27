@@ -50,8 +50,8 @@ class Album ( models.Model ):
 
     def save(self):
         self.name = self.name.strip()
-        while "  " in self.name:
-		self.name = self.name.replace("  ", ' ')
+        self.name = self.name.replace(' ', '_')
+        self.name = self.name.replace('-', '_')
         super(Album, self).save() 
 
 
@@ -101,7 +101,9 @@ class Order ( models.Model ):
 
 class BestPhoto (models.Model):
     image_url = models.CharField( max_length = 1024 )
-
+    image_id = models.CharField(max_length = 100)
+class BestAlbum (models.Model):
+    album_id = models.CharField(max_length = 100)
 
 class LastUpdated (models.Model):
     last_visit = models.DateTimeField()

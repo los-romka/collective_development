@@ -17,22 +17,17 @@ from django.core.mail      import EmailMessage
 from django.conf      import settings
 from email.MIMEImage      import MIMEImage
 from django          import template
-from config             import ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
+from config             import ACCOUNT_ID,ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
 import gdata.photos.service
-import gdata.media
-import gdata.geo
+#import gdata.media
+#import gdata.geo
 import cgi
 import datetime
 
 
 import sys, traceback
 
-
 LAST_VISIT_TO_ACCOUNT = 0
-
-
-
-
 
 # Parsing tag info 
 
@@ -69,7 +64,7 @@ def api_data_extraction():
     developerKey =       'AIzaSyAKCO6eEQHQLN32ZARi2TOoJXVP88EZW4c')
     activities_resource = service.activities()
     request = activities_resource.list(
-    userId =             '100915540970866628562',                                               #'103582189468795743999',
+    userId =             ACCOUNT_ID,                                               #100915540970866628562,'103582189468795743999',
     collection =         'public',
     maxResults =         '100' )
 
@@ -269,7 +264,9 @@ def preview_best(request, photoId):
         prices = Price.objects.all()
     except Post.DoesNotExist:
         raise Http404
-    return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })  
+    photo_url = 'https://plus.google.com/u/0/photos/'+ACCOUNT_ID+'/albums/'+BestAlbum.objects.get( id = 1 ).album_id+'/'+photo.image_id
+   # raise Exception, photo_url
+    return render_to_response('preview.html',{ 'photo':photo ,'gurl': photo_url,'album':album, 'album_list':al, 'prices':prices })  
 
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
@@ -327,14 +324,14 @@ def strip_title( text ):
 #--------------------------------------------------------------------------------------------------
 #                                       DESCRIBE_ALBUM
 #--------------------------------------------------------------------------------------------------
-def album( request , idA, page = 1):
+def album( request , idA = "default", page = 1):
     
     page = int(page)
     
     if (page < 1):
         raise Http404
     try:
-        album = Album.objects.get( id = idA)
+        album = Album.objects.get( name = idA)
         al = Album.objects.all()
 
         photos = []
@@ -386,7 +383,7 @@ def home_page( request, page ):
 
 def home( request ):
     refresh_db_with_new_data()
- 
+    refresh_db_with_new_data()
     try:
         last = Post.objects.order_by('-renew')[0:10]
         best_photo = get_best_photo()
@@ -401,7 +398,10 @@ def home( request ):
     
     return render_to_response('index.html',{ 'last':last, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
 
-
+def change_albums_name(album_name):
+    album_name.strip()
+    album_name.replace(' ', '-')
+    return album_name
 
 
 def order(request, idOrder):
@@ -431,7 +431,7 @@ def get_best_photo():
    
     # get photos from db
     for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_url )
+        photos_from_db.append( el )
     
     if len(photos_from_db) == 0 or abs(local_last_visit.hour - now.hour) >= 3 or abs(local_last_visit.day - now.day) >= 1:
         # update last visit in db        
@@ -446,8 +446,16 @@ def update_best_photos():
     gd_client.email = ACCOUNT_EMAIL
     gd_client.password = ACCOUNT_PASSWORD
     gd_client.ProgrammaticLogin()
+    temp_mass_urls = []
+    temp_mass_ids = [] 
     photos_from_account = []
-    photos_from_db=[]
+    photos_from_db = []
+    
+    if len(BestAlbum.objects.all()) == 0:
+        best_album_id = BestAlbum(album_id ="")
+        best_album_id.save()
+
+    best_album_id = BestAlbum.objects.get(id=1)
 
     # retrive datetime (type is string )of last visit to account
     last_update = LastUpdated.objects.get(id=1)
@@ -463,14 +471,16 @@ def update_best_photos():
     albums = gd_client.GetUserFeed()
     
     for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_url ) 
+        photos_from_db.append( el.image_id ) 
 
     # get photos from account
     for album in albums.entry:
         if album.title.text == BEST_PHOTO_ALBUM:
             # if album has updated
             #raise Exception, "update.text: %s , album_update: %s" %(album.updated.text,local_album_update)
-            if album.updated.text != local_album_update:
+            if album.updated.text != local_album_update or album.updated.text == local_album_update:
+                best_album_id.album_id = album.gphoto_id.text
+                best_album_id.save()
                 #update the album_update value in db
                 last_update.album_update = album.updated.text
                 last_update.save()
@@ -478,17 +488,23 @@ def update_best_photos():
                 photos = gd_client.GetFeed('/data/feed/api/user/%s/albumid/%s?kind=photo' % ('default', album.gphoto_id.text)) 
                 #get all photos from account
                 for photo in photos.entry:
-                    photos_from_account.append(photo.content.src)
+                    temp_mass_urls.append(photo.content.src)
+                    temp_mass_ids.append(photo.gphoto_id.text)
+                    #photos_from_account.append(temp_mass_account)
+                    #photos_from_account.append(photo.content.src)
                     #raise Exception, "src is %s" %len(photo.content.src)
                 for el in BestPhoto.objects.all():
-                    if el.image_url not in photos_from_account:
+                    if el.image_id not in temp_mass_ids:
+                    #if el.image_url not in photos_from_account:
                         el.delete() 
   
     # compaire photos from account and db: if the photo from account is absent indb, then the photo is added into db
-    for element in photos_from_account:
+    ind = 0;
+    for element in temp_mass_ids:
         if element not in photos_from_db:
-            p = BestPhoto( image_url = element)
+            p = BestPhoto( image_url = temp_mass_urls[ind], image_id = element)
             p.save()
+        ind = ind +1;
 
     photos_from_db = []
 
