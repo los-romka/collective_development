@@ -130,6 +130,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
+TEST_RUNNER = 'django_test_coverage.runner.CoverageTestSuiteRunner'
+PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(PROJECT_PATH, 'cover')
 
 #EMAIL_HOST = 'localhost'
 #EMAIL_PORT = '1025'
