@@ -324,14 +324,14 @@ def strip_title( text ):
 #--------------------------------------------------------------------------------------------------
 #                                       DESCRIBE_ALBUM
 #--------------------------------------------------------------------------------------------------
-def album( request , idA = "default", page = 1):
+def album( request , idA, page = 1):
     
     page = int(page)
     
     if (page < 1):
         raise Http404
     try:
-        album = Album.objects.get( name = idA)
+        album = Album.objects.get( id = idA)
         al = Album.objects.all()
 
         photos = []
