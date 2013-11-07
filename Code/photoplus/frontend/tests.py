@@ -25,6 +25,26 @@ class SanityTests(WebTest):
     fixtures = ['users.json']
 
 #TS_sanity_001 
+    def testUrls(self):
+        resp = self.app.get('/') 
+        assert resp.status_int == 200
+        resp = self.app.get('/preview/1/')
+        assert resp.status_int == 200 
+        resp = self.app.get('/buy/1/1/')
+        assert resp.status_int == 200
+        resp = self.app.get('/preview_best/1/')
+        assert resp.status_int == 200
+        resp = self.app.get('/albums/1/')
+        assert resp.status_int == 200
+        resp = self.app.get('/albums/1/1')
+        assert resp.status_int == 200
+        resp = self.app.get('/about/')
+        assert resp.status_int == 200 
+        resp = self.app.get('/about/feedback/')
+        assert resp.status_int == 200
+
+logger.setLevel(previous_level)
+"""#TS_sanity_001 
     def testHome(self):
         resp_home = self.app.get('/') 
         assert resp_home.status_int == 200
@@ -53,7 +73,7 @@ class SanityTests(WebTest):
         resp_feedback = self.app.get('/about/feedback/')
         assert resp_feedback.status_int == 200
 
-"""#TS_sanity_002
+#TS_sanity_002
     def testHeader(self):  
         resp_home = self.app.get('/')
         resp_home.mustcontain('<head>','</head>')

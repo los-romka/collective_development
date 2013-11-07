@@ -1,4 +1,5 @@
 # Django settings for photoplus project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -92,6 +93,7 @@ INSTALLED_APPS = (
     'frontend',
     'captcha',
     'django.contrib.flatpages',
+    'django_coverage',
 )
 
 # A sample logging configuration. The only tangible logging
