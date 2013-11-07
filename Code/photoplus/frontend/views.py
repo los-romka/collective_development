@@ -343,7 +343,8 @@ def album( request , idA, page = 1):
     except Album.DoesNotExist:
         raise Http404
 #    photos.sort(key=lambda post: post['id'])
-    
+    photos.sort(reverse=True)
+
     num_last = 10 * page
     num_first = 10 * (page - 1)
     
