@@ -27,6 +27,7 @@ urlpatterns = patterns('',
     url(r'^albums/(?P<idA>\d+)/$', album),
     url(r'^albums/(?P<idA>\d+)/(?P<page>\d+)/$', album),
 
+	url(r'^admin/forced_refresh/(?P<mode>\d+)$',forced_refresh),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
