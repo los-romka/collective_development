@@ -27,97 +27,8 @@ import cgi
 import datetime, time, calendar
 
 import sys, traceback
+from frontend.updates	import *
 
-#begin replacement of rfc3339 - library for update
-ZERO = datetime.timedelta(0)
-
-class tzinfo(datetime.tzinfo):
-    """
-    Implementation of a fixed-offset tzinfo.
-    """
-    def __init__(self, minutesEast = 0, name = 'Z'):
- 
-        self.minutesEast = minutesEast
-        self.offset = datetime.timedelta(minutes = minutesEast)
-        self.name = name
-
-    def utcoffset(self, dt):
-        """Returns minutesEast from the constructor, as a datetime.timedelta."""
-        return self.offset
-
-    def dst(self, dt):
-        """This is a fixed offset tzinfo, so always returns a zero timedelta."""
-        return ZERO
-
-    def tzname(self, dt):
-        """Returns the name from the constructor."""
-        return self.name
-
-    def __repr__(self):
-        """If minutesEast==0, prints specially as rfc3339.UTC_TZ."""
-        if self.minutesEast == 0:
-            return "rfc3339.UTC_TZ"
-        else:
-            return "rfc3339.tzinfo(%s,%s)" % (self.minutesEast, repr(self.name))
-
-UTC_TZ = tzinfo(0, 'Z')
-
-date_re_str = r'(\d\d\d\d)-(\d\d)-(\d\d)'
-time_re_str = r'(\d\d):(\d\d):(\d\d)(\.(\d+))?([zZ]|(([-+])(\d\d):?(\d\d)))'
-
-def make_re(*parts):
-    return re.compile(r'^\s*' + ''.join(parts) + r'\s*$')
-
-date_re = make_re(date_re_str)
-datetime_re = make_re(date_re_str, r'[ tT]', time_re_str)
-
-def _offset_to_tzname(offset):
-    
-    offset = int(offset)
-    if offset < 0:
-        tzsign = '-'
-    else:
-        tzsign = '+'
-    offset = abs(offset)
-    tzhour = offset / 60
-    tzmin = offset % 60
-    return '%s%02d:%02d' % (tzsign, tzhour, tzmin)
-
-def parse_datetime(s):
-    
-    m = datetime_re.match(s)
-    if m:
-        (y, m, d, hour, min, sec, ignore1, frac_sec, wholetz, ignore2, tzsign, tzhour, tzmin) = \
-            m.groups()
-
-        if frac_sec:
-            frac_sec = float("0." + frac_sec)
-        else:
-            frac_sec = 0
-        microsec = int((frac_sec * 1000000) + 0.5)
-
-        if wholetz == 'z' or wholetz == 'Z':
-            tz = UTC_TZ
-        else:
-            tzhour = int(tzhour)
-            tzmin = int(tzmin)
-            offset = tzhour * 60 + tzmin
-            if offset == 0:
-                tz = UTC_TZ
-            else:
-                if tzhour > 24 or tzmin > 60 or offset > 1439: ## see tzinfo docs for the 1439 part
-                    raise ValueError('Invalid timezone offset', s, wholetz)
-
-                if tzsign == '-':
-                    offset = -offset
-                tz = tzinfo(offset, _offset_to_tzname(offset))
-
-        return datetime.datetime(int(y), int(m), int(d),
-                                 int(hour), int(min), int(sec), microsec,
-                                 tz)
-    else:
-        raise ValueError('Invalid RFC 3339 datetime string', s)
-#end replacement of rfc3339
 
 LAST_VISIT_TO_ACCOUNT = 0
 
@@ -136,10 +47,6 @@ def get_tags_list( hashstring ):
         t = hashstring.find('<')
         tags_list.append( hashstring[:t] )
     return tags_list
-
-
-
-
 
 
 # Extracting data from 
@@ -211,8 +118,6 @@ def refresh_db_with_new_data( ):
     return
 
 
-
-
 def clear_db( ):
 
     p = Post.objects.all()
@@ -239,7 +144,6 @@ def contact(request):
         form = ReCaptchaForm(  initial={'subject': 'I love your site!'}
                  )
     return render_to_response('contact.html', {'form': form, 'album_list':al}, context_instance=RequestContext(request))
-
 
 
 def buy(request, idP, resolution):    
@@ -475,12 +379,13 @@ def home_page( request, page ):
 #-----------------------------------------------------------------------------------------------------
 
 def home( request ):
-    refresh_db_with_new_data()
-    refresh_db_with_new_data()
+    refresh_db_with_quantity(3)
     try:
         last = Post.objects.order_by('-renew')[0:10]
         best_photo = get_best_photo()
         al = Album.objects.all()
+        #best_photo = []
+        #al=[]
     except Post.DoesNotExist:
         raise Http404
     
@@ -609,118 +514,8 @@ def update_best_photos():
     
     return photos_from_db 
 
- #functions for forced update
-def get_one_page_of_activities(page_token = ''):
-	service = build(     'plus',
-						 'v1', 
-	developerKey =       'AIzaSyAKCO6eEQHQLN32ZARi2TOoJXVP88EZW4c')
-	activities_resource = service.activities()
-	request = activities_resource.list(
-	userId =             '100915540970866628562',                                               #'103582189468795743999',
-	collection =         'public',
-	maxResults =         '100',
-	pageToken =           page_token
-	)
-	return request.execute()
-	
-def filter_only_photo_from_page(list_of_activities):
-	if 'items' not in list_of_activities:
-		list_of_activities['items'] = []
-		return list_of_activities
-	filtered_list = []
-	
-	for activity in list_of_activities['items']:
-		if 'actor' not in activity['object'] and 'attachments' in activity['object'] and activity['object']['attachments'][0]['objectType'] == "photo":
-			filtered_list.append(activity)
-	list_of_activities['items'] = filtered_list
-	return list_of_activities
+#functions for forced update
 
-def get_all_photo_on_one_page( page_token = ''):
-	return filter_only_photo_from_page( get_one_page_of_activities (page_token ) )
-	
-def refresh_db(new_data):
-    posts_list = []
-    
-    for el in Post.objects.all():
-        posts_list.append( el.image_url )
-    
-    for element in new_data:
-        if element[0] not in posts_list:
-            p = Post( image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3] )
-            p.save()
-        else:
-            p = Post.objects.get( image_url = element[0] )
-    
-        if len(element) == 5:
-            tags_list = []
-            for el in Tag.objects.all():
-                tags_list.append( el.name )
-            for tag in element[4]:
-                if tag not in tags_list:
-                    t = Tag ( name = tag )
-                    t.save()
-                    t.posts.add(p)
-                    t.save()
-                else:
-                    t = Tag.objects.filter( name = tag )[0]
-                    t.posts.add(p)
-                    t.save()
-    return	
-
-def api_data_extraction_old(activities_document):
-	#activities_document = get_one_page_of_activities()
-	#activities_document = filter_only_photo_from_page(activities_document)
-	
-	act_list = []
-	for activity in activities_document['items']:
-		act_struct = []
-		act_struct.append( activity['object']['attachments'][0]['fullImage']['url'] ) 
-		act_struct.append( activity['updated'] )
-		act_struct.append( activity['url'] )
-		act_struct.append( strip_title( activity['object']['content'][:40] ) )
-		act_struct.append( get_tags_list( activity['object']['content'] ) )
-		act_list.append( act_struct )
-	return act_list
-	
-def refresh_db_with_quantity( quantity ):
-	result_activity_list = get_all_photo_on_one_page()
-	activity = result_activity_list
-	while 'nextPageToken' in activity and len( result_activity_list['items']) < quantity :
-		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
-		back_index = quantity - len( result_activity_list['items'] ) - len( activity['items'] )
-		if back_index >= 0: 
-			back_index = len( activity['items'] )
-		result_activity_list['items'] += activity['items'][:back_index]
-	refresh_db (api_data_extraction_old ( result_activity_list ) )
-		
-def refresh_db_with_all ():
-	result_activity_list = get_all_photo_on_one_page()
-	activity = result_activity_list
-	while 'nextPageToken' in activity:
-		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
-		result_activity_list['items'] += activity['items']
-	refresh_db (api_data_extraction_old ( result_activity_list ) )
-
-def filter_by_date( activity, num_days ):
-	items = []
-	min_day = date.today() - timedelta(days = num_days)
-	for its in activity['items']:
-		current = parse_datetime( its['updated']).date()
-		if current > min_day:
-			items.append(its)
-		activity['items'] = items
-	return activity
-	
-def refresh_db_with_days(days):
-	result_activity_list = get_all_photo_on_one_page()
-	result_activity_list = filter_by_date(result_activity_list, days)
-	activity = result_activity_list
-	while len(activity['items']) != 0 and 'nextPageToken' in activity:
-		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
-		activity = filter_by_date(activity, days)
-		result_activity_list['items'] += activity['items']
-	refresh_db (api_data_extraction_old ( result_activity_list ) )
-		
 def forced_refresh(request, mode):
 	if int(mode) == 1:
 		refresh_db_with_quantity(100)
@@ -730,4 +525,5 @@ def forced_refresh(request, mode):
 		refresh_db_with_all()
 		
 	return HttpResponseRedirect('../../admin/')
+
 #end of functions for forced refresh

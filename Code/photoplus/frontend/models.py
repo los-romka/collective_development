@@ -19,8 +19,8 @@ class Post ( models.Model ):
 
     post_title = models.CharField( max_length=35 )
     renew = models.DateTimeField( 'date of renewal' )
-    image_url = models.CharField( max_length=200 )
-    post_url = models.CharField( max_length=200 )
+    image_url = models.CharField( max_length=1024 )
+    post_url = models.CharField( max_length=1024 )
 
 
 
@@ -68,7 +68,7 @@ class Admin ( models.Model ):
 
 class Author( models.Model ):
 
-    photo_url = models.CharField( max_length=200 )
+    photo_url = models.CharField( max_length=1024 )
     information = models.TextField(max_length=10000)
     email = models.EmailField()
 
