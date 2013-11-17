@@ -525,5 +525,4 @@ def forced_refresh(request, mode):
 		refresh_db_with_all()
 		
 	return HttpResponseRedirect('../../admin/')
-
 #end of functions for forced refresh
