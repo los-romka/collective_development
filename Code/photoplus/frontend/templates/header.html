@@ -5,6 +5,17 @@
 		<title>Vashchenko.com</title>
 		<link type="text/css" href="/static/frontend/css/main.css" rel="stylesheet">
 		<link media="screen" href="/static/frontend/css/bootstrap/css/bootstrap.css" rel="stylesheet">
+			<script>
+			$('.nav').children('.dropdown').hover(
+			function(){
+			$(this).addClass('open');
+			},
+			function(){
+			$(this).removeClass('open');
+			});
+		</script>
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<script src="/static/frontend/css/bootstrap/js/bootstrap.js"></script>
 	</head>
 	<body>
 		<div class="container">
@@ -47,19 +58,10 @@
 				<span class="muted">Copyright 2013 © Yuri Vashchenko. All rights reserved</span>
 			</div>
 		</div>
-		<script>
-			$('.nav').children('.dropdown').hover(
-			function(){
-			$(this).addClass('open');
-			},
-			function(){
-			$(this).removeClass('open');
-			});
-		</script>
-		<script src="http://code.jquery.com/jquery-latest.js"></script>
-		<script src="/static/frontend/css/bootstrap/js/bootstrap.js"></script>
+		
 	{% endblock %}
 {% endblock %}
 </footer>
 </body>
+
 

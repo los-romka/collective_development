@@ -167,16 +167,18 @@ def preview(request, idP ):
 
 def preview_best(request, photoId):
     try:
-        photoId = int(photoId)
-        photo = BestPhoto.objects.get( id = photoId )
+        #photoId = int(photoId)
+       # photo = BestPhoto.objects.get( id = photoId )
+        photo = photoId
         al = Album.objects.all()
         prices = Price.objects.all()
     except Post.DoesNotExist:
         raise Http404
-    photo_url = 'https://plus.google.com/u/0/photos/'+ACCOUNT_ID+'/albums/'+BestAlbum.objects.get( id = 1 ).album_id+'/'+photo.image_id
+    album_id = BestAlbum.objects.get( id = 1 ).album_id
+    photo_url = 'https://plus.google.com/u/0/photos/'+ACCOUNT_ID+'/albums/'+album_id+'/'+photo
+  
    # raise Exception, photo_url
-    return render_to_response('preview.html',{ 'photo':photo ,'gurl': photo_url,'album':album, 'album_list':al, 'prices':prices })  
-
+    return render_to_response('preview.html',{ 'photo':photo ,'photo_url': photo_url,'photoId': photoId,'album':album, 'album_list':al, 'prices':prices })  
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
 #--------------------------------------------------------------------------------------------------
@@ -293,8 +295,9 @@ def home( request ):
     pages = int(ceil(Post.objects.count() / 10.0))
     paginator = get_paginator_data( page, pages , 2 )
     num_last = len(last)
+    album_id = BestAlbum.objects.get( id = 1 ).album_id
     
-    return render_to_response('index.html',{ 'last':last, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
+    return render_to_response('index.html',{ 'last':last,'account': ACCOUNT_ID,'album_id': album_id, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
 
 def change_albums_name(album_name):
     album_name.strip()
@@ -413,3 +416,4 @@ def update_best_photos():
        # raise Exception, "url %s" % el.image_url
     
     return photos_from_db 
+

@@ -4,39 +4,63 @@
 			<div id="content">
 				{% if best_photo %}
 				<div id="BestPhotos" class="carousel slide">
-
+					<script type="text/javascript">
+						
+						$(document).ready(function(){
+							var mass = new Array();
+							var className = '';
+							$.get('https://picasaweb.google.com/data/feed/api/user/{{account}}/albumid/{{album_id}}?alt=json&access_token=989184939691',function(data){
+								for (var i = 0; i <data.feed.entry.length; i ++ ) {
+									if (i == 0) {
+										className = "active item";
+									}
+									else{
+										className = "item";
+									}
+									mass[i] = data.feed.entry[i].content.src;
+									document.getElementsByName("carousel")[0].innerHTML  += 
+												  
+												  "<div class=\""+className+"\">"+
+													"<a href=\"/preview_best/"+data.feed.entry[i].gphoto$id.$t+"\">"+
+														"<img WIDTH=1020 id=\"best_photo\" style=\"margin-left: 10px; margin-top: 20px; margin-bottom: 20px;\"  class=\"shadow best-photo\" title=\"CLICK TO GO TO POST PAGE\" src=\""+mass[i]+"\" />"+
+													"</a>"+
+												  "</div>";
+								}
+							});""
+						});
+					</script>
 					<!-- Carousel items -->
-					<div class="carousel-inner">
-					{% for e in best_photo %}
-
-						<div class="{% if forloop.first %}active {% endif %}item"><a href="/preview_best/{{ e.id }}"><img WIDTH=1020 id="best_photo" style="margin-left: 10px; margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" class="shadow best-photo" src="{{ e.image_url }}" /></a></div>
-
-					{% endfor %}
+					<div class="carousel-inner" name="carousel">
+					
 					</div>
 					<!-- Carousel nav -->
 					<a class="carousel-control left" href="#BestPhotos" data-slide="prev">&lsaquo;</a>
 					<a class="carousel-control right" href="#BestPhotos" data-slide="next">&rsaquo;</a>
+					</div>
 				</div>
-				<hr />
-				{% endif %}
-
-				<legend><h2 class="category">ALBUM: ALL {% if last %}({{ nf }} to {{ nl }}) {% endif %}</h2></legend>
-				{% if last %}
-				<div class="photos">
-					{% for e in last %}
-			    	<div class="photo">
-			    		<a href="/preview/{{ e.id }}">
-			    		<img height=1024 class="shadow" src="{{ e.image_url }}" />
-			    		</a>
-			    		<a href="{{ e.post_url }}" target="_blank"><h4 class="photo-name">{{ e.post_title }}</h4> 
-			    		<h5 class="photo-date">{{ e.renew }}</h5></a>
-					<br><br>
-			    	</div>
-					{% endfor %}
-			    </div>
-				{% else %}
+					<hr />
+					{% endif %}
+	
+					<legend><h2 class="category">ALBUM: ALL {% if last %}({{ nf }} to {{ nl }}) {% endif %}</h2></legend>
+					
+					{% if last %}
+					<div class="photos">
+						{% for e in last %}
+						<div class="photo">
+							<a href="/preview/{{ e.id }}">
+								<img height=1024 class="shadow" src="{{ e.image_url }}" />
+							</a>
+							<a href="{{ e.post_url }}" target="_blank"><h4 class="photo-name">{{ e.post_title }}</h4>
+								<h5 class="photo-date">{{ e.renew }}</h5>
+							</a>
+							<br><br>
+						</div>
+						{% endfor %}
+					</div>
+					
+					{% else %}
 					<h5 class="category">There is no photo!</h5>
-				{% endif %}
+					{% endif %}
 				<div class="stop-div"></div>
 			    <div class="pagination pagination-centered">
 			    	<ul>
@@ -70,3 +94,4 @@
      			</div>
 	{% endblock %}
 {% endblock %}
+
