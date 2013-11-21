@@ -21,6 +21,7 @@ class Post ( models.Model ):
     renew = models.DateTimeField( 'date of renewal' )
     image_url = models.CharField( max_length=1024 )
     post_url = models.CharField( max_length=1024 )
+    post_id = models.CharField( max_length=1024)
 
 
 

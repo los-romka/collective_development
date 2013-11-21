@@ -1,17 +1,21 @@
-from frontend.models     import Post, Tag
+from models     import Post, Tag
 from django.core.exceptions import ObjectDoesNotExist
-from frontend.rfc3339				import *
+from rfc3339				import *
 from apiclient.discovery import build
+from django.http      import HttpResponseRedirect
+from config             import ACCOUNT_ID
 
 def refresh_db(new_data):
-    
+	if len(new_data) == 0:
+		return
 	for element in new_data:
 		try:
-			p = Post.objects.get( image_url = element[0] )
+			#p = Post.objects.get( image_url = element[0] )
+			p = Post.objects.get( post_id = element[5] )
 			p.delete()
 		except ObjectDoesNotExist:
 			pass
-		p = Post( image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3] )
+		p = Post( image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3], post_id = element[5] )
 		p.save()
 		#eeefasdf
 		
@@ -48,17 +52,20 @@ def strip_title( text ):
         return ""
     return title
 
-	
-def get_one_page_of_activities(page_token = ''):
+def get_activities_resource():
 	service = build(     'plus',
 						 'v1', 
 	developerKey =       'AIzaSyAKCO6eEQHQLN32ZARi2TOoJXVP88EZW4c')
-	activities_resource = service.activities()
+	return service.activities()
+
+def get_one_page_of_activities(page_token = ''):
+	activities_resource = get_activities_resource();
 	request = activities_resource.list(
-	userId =             '100915540970866628562',                                               #'103582189468795743999',
+	userId =             ACCOUNT_ID,       
 	collection =         'public',
 	maxResults =         '30',
-	pageToken =           page_token
+	pageToken =           page_token,
+	fields = 'nextPageToken,items(id, updated, url,  object(actor, content, attachments(objectType, fullImage/url)))'
 	)
 	return request.execute()
 	
@@ -101,8 +108,37 @@ def api_data_extraction_old(activities_document):
 		act_struct.append( strip_title( activity['object']['content'][:40] ) )
 		#act_struct.append( get_tags_list( activity['object']['content'] ) )
 		act_struct.append( tags )
+		act_struct.append( activity['id'])
+		
 		act_list.append( act_struct )
+
 	return act_list
+
+def do_if_deleted(p):
+	p.delete()	
+	return get_need_updates()
+
+def get_need_updates():
+	p = Post.objects.all()
+	if len(p) == 0:
+		refresh_db_with_all()
+		return 0
+	p = p[0]
+	data = api_data_extraction_old ( get_all_photo_on_one_page() )
+	new_ids = [ element[5] for element in data ]
+	new_renew = [ element[1] for element in data ] 
+	
+	old_id = p.post_id
+	old_renew = p.renew
+	
+	try:
+		index = new_ids.index(old_id)
+	except ValueError:
+		return do_if_deleted(p);
+		
+	if new_renew[index] != old_renew :
+		return index + 1;
+	return 0
 	
 def refresh_db_with_days(days):
 	result_activity_list = get_all_photo_on_one_page()
@@ -115,15 +151,16 @@ def refresh_db_with_days(days):
 	refresh_db (api_data_extraction_old ( result_activity_list ) )
 
 def refresh_db_with_quantity( quantity ):
+	if quantity == 0 :
+		return 0
 	result_activity_list = get_all_photo_on_one_page()
 	activity = result_activity_list
-	while 'nextPageToken' in activity and len( result_activity_list['items']) <= quantity :
+	while 'nextPageToken' in activity and len( result_activity_list['items']) < quantity :
 		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
-		back_index = quantity - len( result_activity_list['items'] ) - len( activity['items'] )
-		if back_index >= 0: 
-			back_index = len( activity['items'] )
-		result_activity_list['items'] += activity['items'][:back_index]
-	refresh_db (api_data_extraction_old ( result_activity_list ) )
+		result_activity_list['items'] += activity['items']
+		
+	result_activity_list['items'] = result_activity_list['items'][0:quantity]		
+	refresh_db (api_data_extraction_old ( result_activity_list ) )	
 		
 def refresh_db_with_all ():
 	result_activity_list = get_all_photo_on_one_page()
@@ -132,3 +169,15 @@ def refresh_db_with_all ():
 		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
 		result_activity_list['items'] += activity['items']
 	refresh_db (api_data_extraction_old ( result_activity_list ) )
+	
+#functions for forced update
+
+def forced_refresh(request, mode):
+	if int(mode) == 1:
+		refresh_db_with_quantity(100)
+	if int(mode) == 2:
+		refresh_db_with_days(30)
+	if int(mode) == 3:
+		refresh_db_with_all()
+	return HttpResponseRedirect('../../admin/')
+#end of functions for forced refresh

@@ -29,93 +29,7 @@ import datetime, time, calendar
 import sys, traceback
 from frontend.updates	import *
 
-
 LAST_VISIT_TO_ACCOUNT = 0
-
-# Parsing tag info 
-
-# in : string with hashtags
-# out: list of tags( strings )
-
-def get_tags_list( hashstring ):
-
-    hashstring = hashstring.replace("&#","")
-    tags_list = []
-    for e in range( 0,hashstring.count("ot-hashtag") ):
-        r = hashstring.find('#')+1
-        hashstring = hashstring[r:]
-        t = hashstring.find('<')
-        tags_list.append( hashstring[:t] )
-    return tags_list
-
-
-# Extracting data from 
-# personal account of Yuri Vashchenko
-
-# in : ---
-# out: list of structures like ---> [ url , [ #1_ht , #2_ht , ..
-
-# ! Important: single use of this function spares 1 / 10.000 of API request !
-def api_data_extraction():
-    
-    service = build(     'plus',
-                         'v1', 
-    developerKey =       'AIzaSyAKCO6eEQHQLN32ZARi2TOoJXVP88EZW4c')
-    activities_resource = service.activities()
-    request = activities_resource.list(
-    userId =             ACCOUNT_ID,                                               #100915540970866628562,'103582189468795743999',
-    collection =         'public',
-    maxResults =         '100' )
-
-    act_list = []
-    activities_document = request.execute()
-    if 'items' in activities_document:  
-        for activity in activities_document['items']:                                           # taking every activity
-            if 'actor' not in activity['object']:                                               # if activity is not reshared
-                if 'attachments' in activity['object']:                                         # if activity has attachments
-                    if activity['object']['attachments'][0]['objectType'] == "photo":           # if activity type is photo
-
-                        act_struct = []                                                         # [ url , [ #1_ht , #2_ht , ... ] ]
-                        act_struct.append( activity['object']['attachments'][0]['fullImage']['url'] ) 
-                        act_struct.append( activity['updated'] )
-                        act_struct.append( activity['url'] )
-                        act_struct.append( strip_title( activity['object']['content'][:40] ) )
-                        act_struct.append( get_tags_list( activity['object']['content'] ) )
-                        
-                        act_list.append( act_struct )
-
-    return act_list
-
-def refresh_db_with_new_data( ):
-    
-    new_data = api_data_extraction()
-    posts_list = []
-    
-    for el in Post.objects.all():
-        posts_list.append( el.image_url )
-    
-    for element in new_data:
-        if element[0] not in posts_list:
-            p = Post( image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3] )
-            p.save()
-        else:
-            p = Post.objects.get( image_url = element[0] )
-    
-        if len(element) == 5:
-            tags_list = []
-            for el in Tag.objects.all():
-                tags_list.append( el.name )
-            for tag in element[4]:
-                if tag not in tags_list:
-                    t = Tag ( name = tag )
-                    t.save()
-                    t.posts.add(p)
-                    t.save()
-                else:
-                    t = Tag.objects.filter( name = tag )[0]
-                    t.posts.add(p)
-                    t.save()
-    return
 
 
 def clear_db( ):
@@ -224,7 +138,6 @@ def buy(request, idP, resolution):
     else:
         form = buyForm()
     return render_to_response('buy.html', {'form': form, 'buy':a, 'album_list':al }, context_instance=RequestContext(request))
- 
 
 
 #--------------------------------------------------------------------------------------------------
@@ -302,20 +215,6 @@ def get_paginator_data( page, pages, adjacent_pages=2 ):
         'show_first': 1 not in page_numbers,
         'show_last': pages not in page_numbers,
     }
-#--------------------------------------------------------------------------------------------------
-#                                        STRIP_TITLE
-#--------------------------------------------------------------------------------------------------
-def strip_title( text ):
-    if ( text.startswith("<b>") != True ):
-        return ""
-    pos = text.find("</b>")
-    if (pos == -1):
-        return ""
-    title = text[3:pos]
-    
-    if ( (">" in title) or ("<" in title) or (len(title) > 30 ) ):
-        return ""
-    return title
 
 #--------------------------------------------------------------------------------------------------
 #                                       DESCRIBE_ALBUM
@@ -379,7 +278,8 @@ def home_page( request, page ):
 #-----------------------------------------------------------------------------------------------------
 
 def home( request ):
-    refresh_db_with_quantity(3)
+    refresh_db_with_quantity(get_need_updates())
+    #refresh_db_with_quantity(0)
     try:
         last = Post.objects.order_by('-renew')[0:10]
         best_photo = get_best_photo()
@@ -513,16 +413,3 @@ def update_best_photos():
        # raise Exception, "url %s" % el.image_url
     
     return photos_from_db 
-
-#functions for forced update
-
-def forced_refresh(request, mode):
-	if int(mode) == 1:
-		refresh_db_with_quantity(100)
-	if int(mode) == 2:
-		refresh_db_with_days(30)
-	if int(mode) == 3:
-		refresh_db_with_all()
-		
-	return HttpResponseRedirect('../../admin/')
-#end of functions for forced refresh
