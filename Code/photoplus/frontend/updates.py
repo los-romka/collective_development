@@ -138,7 +138,7 @@ def get_need_updates():
 		
 	if new_renew[index] != old_renew :
 		return index + 1;
-	return 0
+	return index
 	
 def refresh_db_with_days(days):
 	result_activity_list = get_all_photo_on_one_page()
