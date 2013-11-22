@@ -177,7 +177,7 @@ def preview_best(request, photoId):
     photo_url = 'https://plus.google.com/u/0/photos/'+ACCOUNT_ID+'/albums/'+BEST_PHOTO_ALBUM+'/'+photo
   
    # raise Exception, photo_url
-    return render_to_response('preview.html',{ 'photo':photo ,'photo_url': photo_url,'photoId': photoId,'album':album, 'album_list':al, 'prices':prices })  
+    return render_to_response('preview.html',{ 'photo':photo ,'photo_url': photo_url,'account':ACCOUNT_ID, 'albumId':BEST_PHOTO_ALBUM, 'photoId': photoId,'album':album, 'album_list':al, 'prices':prices })  
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
 #--------------------------------------------------------------------------------------------------

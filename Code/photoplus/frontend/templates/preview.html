@@ -16,7 +16,7 @@
 						$(document).ready(function(){
 							var mass = new Array();
 							var className = '';
-							$.get('https://picasaweb.google.com/data/feed/api/user/103314696531052571488/albumid/5901192389019730977/photoid/{{photoId}}?alt=json&access_token=989184939691',function(data){
+							$.get('https://picasaweb.google.com/data/feed/api/user/{{account}}/albumid/{{albumId}}/photoid/{{photoId}}?alt=json&access_token=989184939691',function(data){
 								
 								$("#image").html(
 										 "<img WIDTH=\"1024\" style=\"margin-top: 20px; margin-bottom: 20px;\"  class=\"shadow\" title=\"CLICK TO GO TO POST PAGE\" src=\""+data.feed.media$group.media$content[0].url+"\"/>"
