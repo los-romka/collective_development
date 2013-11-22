@@ -17,7 +17,7 @@ from django.core.mail      import EmailMessage
 from django.conf      import settings
 from email.MIMEImage      import MIMEImage
 from django          import template
-from config             import ACCOUNT_ID,ACCOUNT_EMAIL, ACCOUNT_PASSWORD, BEST_PHOTO_ALBUM
+from config             import *
 import gdata.photos.service
 from datetime			 import date, timedelta
 import re
@@ -284,7 +284,7 @@ def home( request ):
     #refresh_db_with_quantity(0)
     try:
         last = Post.objects.order_by('-renew')[0:10]
-        best_photo = get_best_photo()
+        
         al = Album.objects.all()
         #best_photo = []
         #al=[]
@@ -295,9 +295,9 @@ def home( request ):
     pages = int(ceil(Post.objects.count() / 10.0))
     paginator = get_paginator_data( page, pages , 2 )
     num_last = len(last)
-    album_id = BestAlbum.objects.get( id = 1 ).album_id
     
-    return render_to_response('index.html',{ 'last':last,'account': ACCOUNT_ID,'album_id': album_id, 'best_photo':best_photo,'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
+    
+    return render_to_response('index.html',{ 'last':last,'account': ACCOUNT_ID,'album_id': BEST_PHOTO_ALBUM, 'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
 
 def change_albums_name(album_name):
     album_name.strip()
@@ -315,105 +315,4 @@ def order(request, idOrder):
         raise Http404
     return render_to_response('order.html',{ 'ordersall':ordersall , 'orderlast':orderlast, 'album_list':al })
 
-
-def get_best_photo():
-    now = datetime.datetime.now()
-    # retrive date time of last visit to account
-    
-    if len(LastUpdated.objects.all()) == 0:
-        last_update = LastUpdated(last_visit = now, album_update = "")
-        last_update.save()
-    
-    last_update = LastUpdated.objects.get(id=1)
-    local_last_visit = last_update.last_visit
-
-    
-    photos_from_db = []
-   
-    # get photos from db
-    for el in BestPhoto.objects.all():
-        photos_from_db.append( el )
-    
-    if len(photos_from_db) == 0 or abs(local_last_visit.hour - now.hour) >= 3 or abs(local_last_visit.day - now.day) >= 1:
-        # update last visit in db        
-        last_update.last_visit = now
-        last_update.save()
-        photos_from_db = update_best_photos()
-   
-    return photos_from_db
-    
-def update_best_photos():
-    gd_client = gdata.photos.service.PhotosService()
-    gd_client.email = ACCOUNT_EMAIL
-    gd_client.password = ACCOUNT_PASSWORD
-    gd_client.ProgrammaticLogin()
-    temp_mass_urls = []
-    temp_mass_ids = [] 
-    photos_from_account = []
-    photos_from_db = []
-    
-    if len(BestAlbum.objects.all()) == 0:
-        best_album_id = BestAlbum(album_id ="")
-        best_album_id.save()
-
-    best_album_id = BestAlbum.objects.get(id=1)
-
-    # retrive datetime (type is string )of last visit to account
-    last_update = LastUpdated.objects.get(id=1)
-    local_album_update = last_update.album_update
-
-    update_date = 0 # best photos album's update time 
-    act_list = []
-    #last_update = 0 # best photos album's update time. It is taked from last photo info from db
-
-    # get photos from db
-   
-      
-    albums = gd_client.GetUserFeed()
-    
-    for el in BestPhoto.objects.all():
-        photos_from_db.append( el.image_id ) 
-
-    # get photos from account
-    for album in albums.entry:
-        if album.title.text == BEST_PHOTO_ALBUM:
-            # if album has updated
-            #raise Exception, "update.text: %s , album_update: %s" %(album.updated.text,local_album_update)
-            if album.updated.text != local_album_update or album.updated.text == local_album_update:
-                best_album_id.album_id = album.gphoto_id.text
-                best_album_id.save()
-                #update the album_update value in db
-                last_update.album_update = album.updated.text
-                last_update.save()
-                
-                photos = gd_client.GetFeed('/data/feed/api/user/%s/albumid/%s?kind=photo' % ('default', album.gphoto_id.text)) 
-                #get all photos from account
-                for photo in photos.entry:
-                    temp_mass_urls.append(photo.content.src)
-                    temp_mass_ids.append(photo.gphoto_id.text)
-                    #photos_from_account.append(temp_mass_account)
-                    #photos_from_account.append(photo.content.src)
-                    #raise Exception, "src is %s" %len(photo.content.src)
-                for el in BestPhoto.objects.all():
-                    if el.image_id not in temp_mass_ids:
-                    #if el.image_url not in photos_from_account:
-                        el.delete() 
-  
-    # compaire photos from account and db: if the photo from account is absent indb, then the photo is added into db
-    ind = 0;
-    for element in temp_mass_ids:
-        if element not in photos_from_db:
-            p = BestPhoto( image_url = temp_mass_urls[ind], image_id = element)
-            p.save()
-        ind = ind +1;
-
-    photos_from_db = []
-
-   # raise Exception, "length db is %d" %len(BestPhoto.objects.all()) 
-    for el in BestPhoto.objects.all():
-       # photos_from_db.append( el.image_url )  
-        photos_from_db.append( el ) 
-       # raise Exception, "url %s" % el.image_url
-    
-    return photos_from_db 
 
