@@ -283,10 +283,7 @@ def home( request ):
     #refresh_db_with_quantity(0)
     try:
         last = Post.objects.order_by('-renew')[0:10]
-        
         al = Album.objects.all()
-        #best_photo = []
-        #al=[]
     except Post.DoesNotExist:
         raise Http404
     

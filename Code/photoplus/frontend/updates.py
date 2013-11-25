@@ -5,29 +5,20 @@ from apiclient.discovery import build
 from django.http      import HttpResponseRedirect
 from config             import ACCOUNT_ID
 
-def refresh_db(new_data):
+def refresh_db(new_data, all_records = False):
 	if len(new_data) == 0:
 		return
+
+	if not all_records:
+		new_ids = [element[5] for element in new_data]
+		Post.objects.filter(post_id__in=new_ids).delete()
+
 	for element in new_data:
-		try:
-			#p = Post.objects.get( image_url = element[0] )
-			p = Post.objects.get( post_id = element[5] )
-			p.delete()
-		except ObjectDoesNotExist:
-			pass
-		p = Post( image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3], post_id = element[5] )
-		p.save()
-		#eeefasdf
+		p = Post.objects.create(image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3], post_id = element[5])		
 		
 		for tag in element[4]:
-			try:
-				t = Tag.objects.get( name = tag )
-			except ObjectDoesNotExist:
-				t = Tag( name = tag )
-				t.save()
+			t,created = Tag.objects.get_or_create(name = tag)
 			t.posts.add(p)
-			t.save()
-	Post.objects.order_by('-renew')
 
 def get_tags_list( hashstring ):
 
@@ -58,12 +49,12 @@ def get_activities_resource():
 	developerKey =       'AIzaSyAKCO6eEQHQLN32ZARi2TOoJXVP88EZW4c')
 	return service.activities()
 
-def get_one_page_of_activities(page_token = ''):
+def get_one_page_of_activities(page_token = '', max_res = '10'):
 	activities_resource = get_activities_resource();
 	request = activities_resource.list(
 	userId =             ACCOUNT_ID,       
 	collection =         'public',
-	maxResults =         '30',
+	maxResults =         max_res,
 	pageToken =           page_token,
 	fields = 'nextPageToken,items(id, updated, url,  object(actor, content, attachments(objectType, fullImage/url)))'
 	)
@@ -81,8 +72,8 @@ def filter_only_photo_from_page(list_of_activities):
 	list_of_activities['items'] = filtered_list
 	return list_of_activities	
 	
-def get_all_photo_on_one_page( page_token = ''):
-	return filter_only_photo_from_page( get_one_page_of_activities (page_token ) )
+def get_all_photo_on_one_page( page_token = '', max_res = '100'):
+	return filter_only_photo_from_page( get_one_page_of_activities (page_token, max_res) )
 	
 def filter_by_date( activity, num_days ):
 	items = []
@@ -115,16 +106,26 @@ def api_data_extraction_old(activities_document):
 	return act_list
 
 def do_if_deleted(p):
-	p.delete()	
-	return get_need_updates()
+	pass
+	#p.delete()	
+	#return get_need_updates()
+	
+	
+	
+	
+	
+	
 
-def get_need_updates():
-	p = Post.objects.all()
-	if len(p) == 0:
+'''def get_need_updates():
+	#p = Post.objects.all()
+	if Post.objects.count() == 0:
 		refresh_db_with_all()
 		return 0
+	
+	p = Post.objects.order_by('-renew')
 	p = p[0]
-	data = api_data_extraction_old ( get_all_photo_on_one_page() )
+	
+	data = api_data_extraction_old ( get_all_photo_on_one_page(max_res = '5') )
 	new_ids = [ element[5] for element in data ]
 	new_renew = [ element[1] for element in data ] 
 	
@@ -138,7 +139,36 @@ def get_need_updates():
 		
 	if new_renew[index] != old_renew :
 		return index + 1;
-	return index
+	return index'''
+	
+	
+def get_need_updates():
+	if Post.objects.count() == 0:
+		refresh_db_with_all()
+		return 0, []
+	
+	p = Post.objects.order_by('-renew')
+	p = p[0]
+	
+	data = api_data_extraction_old ( get_all_photo_on_one_page(max_res = '5') )
+	new_ids = [ element[5] for element in data ]
+	new_renew = [ element[1] for element in data ] 
+	
+	old_id = p.post_id
+	old_renew = p.renew
+	
+	try:
+		index = new_ids.index(old_id)
+	except ValueError:
+		return 0, data
+		
+	if new_renew[index] != old_renew :
+		return index + 1, data;
+	return index, data
+	
+	
+	
+	
 	
 def refresh_db_with_days(days):
 	result_activity_list = get_all_photo_on_one_page()
@@ -149,8 +179,12 @@ def refresh_db_with_days(days):
 		activity = filter_by_date(activity, days)
 		result_activity_list['items'] += activity['items']
 	refresh_db (api_data_extraction_old ( result_activity_list ) )
+	
+	
+	
+	
 
-def refresh_db_with_quantity( quantity ):
+'''def refresh_db_with_quantity( quantity ):
 	if quantity == 0 :
 		return 0
 	result_activity_list = get_all_photo_on_one_page()
@@ -160,21 +194,53 @@ def refresh_db_with_quantity( quantity ):
 		result_activity_list['items'] += activity['items']
 		
 	result_activity_list['items'] = result_activity_list['items'][0:quantity]		
-	refresh_db (api_data_extraction_old ( result_activity_list ) )	
+	refresh_db (api_data_extraction_old ( result_activity_list ) )'''
+	
+	
+def refresh_db_with_quantity( obj):
+	quantity = obj[0]
+	data = obj[1]
+	if quantity == 0 :
+		return 
+	if data != []:
+		refresh_db (data )
+		return
 		
+	result_activity_list = get_all_photo_on_one_page()	
+	activity = result_activity_list
+	while 'nextPageToken' in activity and len( result_activity_list['items']) < quantity :
+		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
+		result_activity_list['items'] += activity['items']
+		
+	result_activity_list['items'] = result_activity_list['items'][0:quantity]
+
+	
+	refresh_db (api_data_extraction_old ( result_activity_list ) )
+
+
+
+	
+	
+def clear_all_db():
+	Post.objects.all().delete()
+	Tag.objects.all().delete()
+	
+
 def refresh_db_with_all ():
+	clear_all_db()
 	result_activity_list = get_all_photo_on_one_page()
 	activity = result_activity_list
 	while 'nextPageToken' in activity:
 		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
 		result_activity_list['items'] += activity['items']
-	refresh_db (api_data_extraction_old ( result_activity_list ) )
+	refresh_db (api_data_extraction_old ( result_activity_list ), True )
 	
 #functions for forced update
 
 def forced_refresh(request, mode):
+	
 	if int(mode) == 1:
-		refresh_db_with_quantity(100)
+		refresh_db_with_quantity((100, []))
 	if int(mode) == 2:
 		refresh_db_with_days(30)
 	if int(mode) == 3:
