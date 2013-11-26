@@ -4,18 +4,22 @@ from rfc3339				import *
 from apiclient.discovery import build
 from django.http      import HttpResponseRedirect
 from config             import ACCOUNT_ID
+from threading			import *
+
+lock = Lock()
+isBusy = False
 
 def refresh_db(new_data, all_records = False):
 	if len(new_data) == 0:
 		return
-
+	
 	if not all_records:
 		new_ids = [element[5] for element in new_data]
 		Post.objects.filter(post_id__in=new_ids).delete()
 
 	for element in new_data:
 		p = Post.objects.create(image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3], post_id = element[5])		
-		
+			
 		for tag in element[4]:
 			t,created = Tag.objects.get_or_create(name = tag)
 			t.posts.add(p)
@@ -105,55 +109,28 @@ def api_data_extraction_old(activities_document):
 
 	return act_list
 
-def do_if_deleted(p):
-	pass
-	#p.delete()	
-	#return get_need_updates()
-	
-	
-	
-	
-	
-	
 
-'''def get_need_updates():
-	#p = Post.objects.all()
-	if Post.objects.count() == 0:
-		refresh_db_with_all()
-		return 0
-	
-	p = Post.objects.order_by('-renew')
-	p = p[0]
-	
-	data = api_data_extraction_old ( get_all_photo_on_one_page(max_res = '5') )
-	new_ids = [ element[5] for element in data ]
-	new_renew = [ element[1] for element in data ] 
-	
-	old_id = p.post_id
-	old_renew = p.renew
-	
-	try:
-		index = new_ids.index(old_id)
-	except ValueError:
-		return do_if_deleted(p);
-		
-	if new_renew[index] != old_renew :
-		return index + 1;
-	return index'''
-	
-	
+
 def get_need_updates():
+	global isBusy
+	
+	with lock:
+		if isBusy:
+			return 0, []
+		isBusy = True
+	
 	if Post.objects.count() == 0:
 		refresh_db_with_all()
 		return 0, []
 	
-	p = Post.objects.order_by('-renew')
-	p = p[0]
-	
 	data = api_data_extraction_old ( get_all_photo_on_one_page(max_res = '5') )
+		
 	new_ids = [ element[5] for element in data ]
 	new_renew = [ element[1] for element in data ] 
 	
+	
+	p = Post.objects.order_by('-renew')
+	p = p[0]
 	old_id = p.post_id
 	old_renew = p.renew
 	
@@ -161,14 +138,11 @@ def get_need_updates():
 		index = new_ids.index(old_id)
 	except ValueError:
 		return 0, data
-		
+	
 	if new_renew[index] != old_renew :
 		return index + 1, data;
 	return index, data
-	
-	
-	
-	
+
 	
 def refresh_db_with_days(days):
 	result_activity_list = get_all_photo_on_one_page()
@@ -181,29 +155,20 @@ def refresh_db_with_days(days):
 	refresh_db (api_data_extraction_old ( result_activity_list ) )
 	
 	
+def refresh_db_with_quantity( obj ):
+	global isBusy
 	
-	
-
-'''def refresh_db_with_quantity( quantity ):
-	if quantity == 0 :
-		return 0
-	result_activity_list = get_all_photo_on_one_page()
-	activity = result_activity_list
-	while 'nextPageToken' in activity and len( result_activity_list['items']) < quantity :
-		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
-		result_activity_list['items'] += activity['items']
-		
-	result_activity_list['items'] = result_activity_list['items'][0:quantity]		
-	refresh_db (api_data_extraction_old ( result_activity_list ) )'''
-	
-	
-def refresh_db_with_quantity( obj):
 	quantity = obj[0]
 	data = obj[1]
 	if quantity == 0 :
+		with lock:
+			isBusy = False
 		return 
+	
 	if data != []:
 		refresh_db (data )
+		with lock:
+			isBusy = False
 		return
 		
 	result_activity_list = get_all_photo_on_one_page()	
@@ -214,12 +179,9 @@ def refresh_db_with_quantity( obj):
 		
 	result_activity_list['items'] = result_activity_list['items'][0:quantity]
 
-	
 	refresh_db (api_data_extraction_old ( result_activity_list ) )
-
-
-
-	
+	with lock:
+		isBusy = False
 	
 def clear_all_db():
 	Post.objects.all().delete()
@@ -227,13 +189,15 @@ def clear_all_db():
 	
 
 def refresh_db_with_all ():
-	clear_all_db()
+	
 	result_activity_list = get_all_photo_on_one_page()
 	activity = result_activity_list
 	while 'nextPageToken' in activity:
 		activity = get_all_photo_on_one_page( activity['nextPageToken'] )
 		result_activity_list['items'] += activity['items']
-	refresh_db (api_data_extraction_old ( result_activity_list ), True )
+	with lock:
+		clear_all_db()
+		refresh_db (api_data_extraction_old ( result_activity_list ), True )
 	
 #functions for forced update
 

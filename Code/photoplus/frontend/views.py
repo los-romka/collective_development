@@ -279,8 +279,11 @@ def home_page( request, page ):
 #-----------------------------------------------------------------------------------------------------
 
 def home( request ):
-    refresh_db_with_quantity(get_need_updates())
-    #refresh_db_with_quantity(0)
+    #refresh_db_with_quantity(get_need_updates())
+
+    t = Thread(target = refresh_db_with_quantity, args = get_need_updates())
+    t.start()
+    t.join()
     try:
         last = Post.objects.order_by('-renew')[0:10]
         al = Album.objects.all()
