@@ -21,17 +21,16 @@
 								$("#image").html(
 										 "<img WIDTH=\"1024\" style=\"margin-top: 20px; margin-bottom: 20px;\"  class=\"shadow\" title=\"CLICK TO GO TO POST PAGE\" src=\""+data.feed.media$group.media$content[0].url+"\"/>"
 										 );
-							});""
+							});
 						});
 						
 					</script>
-	
 	{% if photo.post_url == null %}
-		<a href="{{ photo_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo.image_url }}"/></a>
+		<a href="{{ photo_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo_url }}"/></a>
 		<a href="{{ photo_url }}" target="_blank">CLICK HERE TO LEAVE COMMENT</a>
 		
 	{% else %}
-		<a href="{{ photo_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo.image_url }}"/></a>
+		<a href="{{ photo.post_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo.image_url }}"/></a>
 		<a href="{{ photo.post_url }}" target="_blank">CLICK HERE TO LEAVE COMMENT</a>
 	{% endif %}
 	<br><br>
@@ -54,4 +53,5 @@
 	</script>
 	{% endblock %}
 {% endblock %}
+
 
