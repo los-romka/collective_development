@@ -41,7 +41,7 @@
 		<input type="radio" name="priceRadios" id="priceRadios{{ forloop.counter }}" value="{{ e.id }}"
 		{% if forloop.first %} checked{% endif %} />
 		{{ e.size }}*{{e.on}}
-		{{ e.price }}$
+		${{ e.price }}
 		</label>
 	{% endfor %}
 	</form>
