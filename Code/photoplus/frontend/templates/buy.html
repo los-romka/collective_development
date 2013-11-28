@@ -2,10 +2,6 @@
 {% block page %}
 	{% block content %}     
 
-<style type="text/css">
-   #signinButton {float: right;}
-</style>
-
 <script src="https://apis.google.com/js/plusone.js" type="text/javascript">
  	window.___gcfg = {lang: 'en-US'}
 </script>
@@ -16,9 +12,6 @@
        po.src = 'https://apis.google.com/js/client:plusone.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
-
-
- 	
 
 function signinCallback(authResult) {
   if (authResult['status']['signed_in']) {
@@ -54,7 +47,7 @@ function signinCallback(authResult) {
 <style type="text/css">
   .hide { display: none;}
   .show { display: block;}
-  #signin-button {float: right;}
+  #signinButton {float: right;}
 </style>
    
   
