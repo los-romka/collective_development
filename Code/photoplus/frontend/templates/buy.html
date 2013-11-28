@@ -1,28 +1,31 @@
 {% extends "header.html" %}
 {% block page %}
-	{% block content %}       
- 
-  <style type="text/css">
-  .hide { display: none;}
-  .show { display: block;}
-  #signin-button {float: right;}
-  </style>
-  <script src="https://apis.google.com/js/plusone.js" type="text/javascript">
+	{% block content %}     
+
+<style type="text/css">
+   #signinButton {float: right;}
+</style>
+
+<script src="https://apis.google.com/js/plusone.js" type="text/javascript">
  	window.___gcfg = {lang: 'en-US'}
-  </script>
-  <script type="text/javascript">
-  /*
-   * Срабатывает, когда пользователь принимает условия
-   * входа, не принимает их или закрывает окно.
-   */
-   
-   function loginFinishedCallback(authResult) {
-    if (authResult) {
-      if (authResult['error'] == undefined){
-        gapi.auth.setToken(authResult); // Сохраняет возвращенный токен.
-        toggleElement('signin-button'); // Скрывает кнопку входа после успешного входа.
-	
-	$.get('https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=' + authResult['access_token'], function(data) {
+</script>
+
+<script type="text/javascript">
+      (function() {
+       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://apis.google.com/js/client:plusone.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+     })();
+
+
+ 	
+
+function signinCallback(authResult) {
+  if (authResult['status']['signed_in']) {
+    // Update the app to reflect a signed in user
+    // Hide the sign-in button now that the user is authorized, for example:
+    document.getElementById('signinButton').setAttribute('style', 'display: none');
+    $.get('https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=' + authResult['access_token'], function(data) {
  
                     console.log(data)//Google Auth response с данными пользователя
 		    $('#id_Email').val(data.email);	
@@ -34,15 +37,27 @@
 				$('#id_FirstName').val(data2.name.givenName);
 				$('#id_LastName').val(data2.name.familyName);	
 			});
-                }); 	
-      } else {
-        console.log('An error occurred');
-      }
-    } else {
-      console.log('Empty authResult');  // Произошла ошибка
-    }
+    });
+    
+  } else {
+    // Update the app to reflect a signed out user
+    // Possible error values:
+    //   "user_signed_out" - User is signed-out
+    //   "access_denied" - User denied access to your app
+    //   "immediate_failed" - Could not automatically log in the user
+    console.log('Sign-in state: ' + authResult['error']);
   }
-</script>
+}
+
+    </script>
+  
+<style type="text/css">
+  .hide { display: none;}
+  .show { display: block;}
+  #signin-button {float: right;}
+</style>
+   
+  
 <div id="content">
 
  <div id="profile"></div>
@@ -50,18 +65,20 @@
  <legend>
          <h2>Order print</h2>
  
-    <div id="signin-button" class="show">
-     <div 
-	class="g-signin" 
-	data-callback="loginFinishedCallback"
-        data-approvalprompt="force"
-        data-clientid="430229744748.apps.googleusercontent.com"
-        data-scope="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.email"
-        data-theme="light"
-	data-width="wide"
-        data-cookiepolicy="single_host_origin">
-     </div>
-    </div>
+    <span id="signinButton">
+  <span
+    class="g-signin"
+    data-callback="signinCallback"
+    data-clientid="430229744748.apps.googleusercontent.com"
+    data-cookiepolicy="single_host_origin"
+    data-requestvisibleactions="http://schemas.google.com/AddActivity"
+    data-scope="https://www.googleapis.com/auth/plus.login  https://www.googleapis.com/auth/userinfo.email"
+    data-theme="light"
+    data-width="wide">
+  </span>
+</span>
+
+
   </legend>
 	
     <form class="form-horizontal" action="" method="post">  
