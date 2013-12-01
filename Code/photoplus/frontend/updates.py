@@ -18,7 +18,7 @@ def refresh_db(new_data, all_records = False):
 		Post.objects.filter(post_id__in=new_ids).delete()
 
 	for element in new_data:
-		p = Post.objects.create(image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3], post_id = element[5])		
+		p = Post.objects.create(image_url = element[0] , renew = element[1] , post_url = element[2] , post_title = element[3], post_id = element[5], photo_id = element[6])		
 			
 		for tag in element[4]:
 			t,created = Tag.objects.get_or_create(name = tag)
@@ -60,7 +60,7 @@ def get_one_page_of_activities(page_token = '', max_res = '10'):
 	collection =         'public',
 	maxResults =         max_res,
 	pageToken =           page_token,
-	fields = 'nextPageToken,items(id, updated, url,  object(actor, content, attachments(objectType, fullImage/url)))'
+	fields = 'nextPageToken,items(id, updated, url,  object(actor, content, attachments(id, objectType, fullImage/url)))'
 	)
 	return request.execute()
 	
@@ -104,6 +104,8 @@ def api_data_extraction_old(activities_document):
 		#act_struct.append( get_tags_list( activity['object']['content'] ) )
 		act_struct.append( tags )
 		act_struct.append( activity['id'])
+		act_struct.append( activity['object']['attachments'][0]['id'].split('.')[1])
+
 		
 		act_list.append( act_struct )
 

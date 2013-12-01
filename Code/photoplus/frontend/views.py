@@ -18,8 +18,8 @@ from django.conf      import settings
 from email.MIMEImage      import MIMEImage
 from django          import template
 from config             import *
-import gdata.photos.service
-from datetime			 import date, timedelta
+# import gdata.photos.service
+from datetime            import date, timedelta
 import re
 #import gdata.media
 #import gdata.geo
@@ -27,7 +27,7 @@ import cgi
 import datetime, time, calendar
 
 import sys, traceback
-from frontend.updates	import *
+from frontend.updates   import *
 
 LAST_VISIT_TO_ACCOUNT = 0
 
@@ -68,9 +68,9 @@ def buy(request, idP, resolution):
         al = Album.objects.all()
         a = Message.objects.get(id=1)
         pr = Price.objects.get( id = resolution)
-        idP = int(idP)
-        photo_id = Post.objects.get( id = idP )
-    
+        idP = str(idP)
+        photo_id = Post.objects.get( photo_id = idP )
+
     except Post.DoesNotExist:
         raise Http404
    
@@ -133,8 +133,7 @@ def buy(request, idP, resolution):
             msg_to.content_subtype = "html"  # Main content is now text/html
            
             msg_to.send()
-
-        return HttpResponseRedirect('/preview/' + str(idP))
+            return HttpResponseRedirect('/preview/' + str(idP))
     else:
         form = buyForm()
     return render_to_response('buy.html', {'form': form, 'buy':a, 'album_list':al }, context_instance=RequestContext(request))
@@ -154,30 +153,25 @@ def about(request):
 #--------------------------------------------------------------------------------------------------
 #                                          PREVIEW
 #--------------------------------------------------------------------------------------------------
-def preview(request, idP ):
-    try:
-        #album = Album.objects.get( name = idA)
-        idP = int(idP)
-        photo = Post.objects.get( id = idP )
-        al = Album.objects.all()
-        prices = Price.objects.all()
-    except Post.DoesNotExist:
-        raise Http404
-    return render_to_response('preview.html',{ 'photo':photo , 'album':album, 'album_list':al, 'prices':prices })
+# def preview(request, idP ):
+#     try:
+#         idP = int(idP)
+#         photo = Post.objects.get( id = idP )
+#         prices = Price.objects.all()
+#     except Post.DoesNotExist:
+#         raise Http404
+#     return render_to_response('preview.html',{ 'photo':photo , 'prices':prices })
 
-def preview_best(request, photoId):
+def preview(request, photoId):
     try:
-        #photoId = int(photoId)
-       # photo = BestPhoto.objects.get( id = photoId )
-        photo = photoId
-        al = Album.objects.all()
+        photo = str(photoId)
         prices = Price.objects.all()
     except Post.DoesNotExist:
         raise Http404
     photo_url = 'https://plus.google.com/u/0/photos/'+ACCOUNT_ID+'/albums/'+BEST_PHOTO_ALBUM+'/'+photo
   
    # raise Exception, photo_url
-    return render_to_response('preview.html',{ 'photo':photo ,'photo_url': photo_url,'account':ACCOUNT_ID, 'albumId':BEST_PHOTO_ALBUM, 'photoId': photoId,'album':album, 'album_list':al, 'prices':prices })  
+    return render_to_response('preview.html',{ 'photo':photo ,'photo_url': photo_url,'account':ACCOUNT_ID, 'albumId':BEST_PHOTO_ALBUM, 'photoId': photoId, 'prices':prices })  
 #--------------------------------------------------------------------------------------------------
 #                                      GET_PAGINATOR_DATA
 #--------------------------------------------------------------------------------------------------
