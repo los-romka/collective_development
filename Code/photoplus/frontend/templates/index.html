@@ -9,7 +9,7 @@
 						$(document).ready(function(){
 							var mass = new Array();
 							var className = '';
-							$.get('https://picasaweb.google.com/data/feed/api/user/{{account}}/albumid/{{album_id}}?alt=json&access_token=989184939691',function(data){
+							$.get("https://picasaweb.google.com/data/feed/api/user/{{account}}/albumid/{{album_id}}?alt=json&access_token=989184939691",function(data){
 								for (var i = 0; i <data.feed.entry.length; i ++ ) {
 									if (i == 0) {
 										className = "active item";
@@ -21,7 +21,7 @@
 									document.getElementsByName("carousel")[0].innerHTML  += 
 												  
 												  "<div class=\""+className+"\">"+
-													"<a href=\"/preview_best/"+data.feed.entry[i].gphoto$id.$t+"\">"+
+													"<a href=\"/preview/"+data.feed.entry[i].gphoto$id.$t+"\">"+
 														"<img WIDTH=1020 id=\"best_photo\" style=\"margin-left: 10px; margin-top: 20px; margin-bottom: 20px;\"  class=\"shadow best-photo\" title=\"CLICK TO GO TO POST PAGE\" src=\""+mass[i]+"\" />"+
 													"</a>"+
 												  "</div>";
@@ -49,7 +49,7 @@
 					<div class="photos">
 						{% for e in last %}
 						<div class="photo">
-							<a href="/preview/{{ e.id }}">
+							<a href="/preview/{{ e.photo_id }}">
 								<img height=1024 class="shadow" src="{{ e.image_url }}" />
 							</a>
 							<a href="{{ e.post_url }}" target="_blank"><h4 class="photo-name">{{ e.post_title }}</h4>

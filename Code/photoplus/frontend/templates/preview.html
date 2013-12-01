@@ -46,8 +46,11 @@
 	</form>
 	<button id="buyButton" type="submit" class="btn">Order print</button>
 	<script>
+	console.log(document.location.href.split('/')[document.location.href.split('/').length-2]);
+	</script>
+	<script>
 			function buy_try() { 
-				document.location.href = '/buy/' + {{ photo.id }} + '/' + $('input[name="priceRadios"]:checked').val() + '/';
+				document.location.href = '/buy/' + document.location.href.split('/')[document.location.href.split('/').length-2] + '/' + $('input[name="priceRadios"]:checked').val() + '/';
 			}
 			document.getElementById("buyButton").onclick = buy_try;
 	</script>

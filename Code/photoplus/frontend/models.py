@@ -22,6 +22,7 @@ class Post ( models.Model ):
     image_url = models.CharField( max_length=1024 )
     post_url = models.CharField( max_length=1024 )
     post_id = models.CharField( max_length=255, unique=True)
+    photo_id = models.CharField( max_length=255, unique=True)
 
 
 
