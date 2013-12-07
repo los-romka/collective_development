@@ -9,7 +9,7 @@
 				<div class="photos">
 					{% for e in photos %}
 			    	<div class="photo">
-			    		<a href="/preview/{{ e.id }}">
+			    		<a href="/preview/{{ e.photo_id }}">
 			    		<img class="shadow" src="{{ e.image_url }}" />
 			    		</a>
 			    		<a href="{{ e.post_url }}" target="_blank"><h4 class="photo-name">{{ e.post_title }}</h4> 

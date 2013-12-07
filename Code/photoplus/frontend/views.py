@@ -65,11 +65,9 @@ def buy(request, idP, resolution):
         al = Album.objects.all()
         a = Message.objects.get(id=1)
         pr = Price.objects.get( id = resolution)
-        al = Album.objects.all()
         a = Message.objects.get(id=1)
         pr = Price.objects.get( id = resolution)
         idP = str(idP)
-        photo_id = Post.objects.get( photo_id = idP )
 
     except Post.DoesNotExist:
         raise Http404
@@ -101,9 +99,9 @@ def buy(request, idP, resolution):
             l_name = cd['LastName']
             price = pr.price
             size = str(pr.size) + u"*" + str(pr.on)
-            post_title = photo_id.post_title
-            image_url =  photo_id.image_url 
-            post_url =  photo_id.post_url 
+            post_title = "photo"
+            image_url =  "https://plus.google.com/photos?pid="+idP+"&oid="+ACCOUNT_ID
+            post_url =  image_url
         
             order = Order(name= l_name + u" " + f_name,
               adress = street1 + u", " + street2 + u", " + city + u", " + state + u", " + country + u", " + zip_code,
