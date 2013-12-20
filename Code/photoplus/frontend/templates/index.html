@@ -58,11 +58,7 @@
 						</div>
 						{% endfor %}
 					</div>
-					
-					{% else %}
-					<h5 class="category">There is no photo!</h5>
-					{% endif %}
-				<div class="stop-div"></div>
+					<div class="stop-div"></div>
 			    <div class="pagination pagination-centered">
 			    	<ul>
 						{% if paginator.has_previous %}
@@ -93,6 +89,10 @@
 					</ul>
 				</div>
      			</div>
+					{% else %}
+					<h5 class="category">There is no photo!</h5>
+					{% endif %}
+				
 	{% endblock %}
 {% endblock %}
 
