@@ -26,6 +26,8 @@ import re
 import cgi
 import datetime, time, calendar
 
+import gdata.spreadsheet.service
+
 import sys, traceback
 from frontend.updates   import *
 
@@ -123,14 +125,43 @@ def buy(request, idP, resolution):
             subjectmessage_to = s_to.render(c)
     
             msg_from= EmailMessage(subjectmessage_from, message_from, email_from, [email_to]) 
-            msg_from.content_subtype = "html"  # Main content is now text/html
-           
-            msg_from.send()
-
+            msg_from.content_subtype = "html"  # Main content is now text/html           
             msg_to = EmailMessage(subjectmessage_to, message_to, email_from, [email_from]) 
             msg_to.content_subtype = "html"  # Main content is now text/html
+
+	    spreadsheet_key = SPREADSHEET_KEY
+	    worksheet_id = 'od6'
+	    spr_client = gdata.spreadsheet.service.SpreadsheetsService()
+	    spr_client.email = ACCOUNT_EMAIL
+	    spr_client.password = ACCOUNT_PASSWORD
+	    spr_client.source = 'Orders'
+	    spr_client.ProgrammaticLogin()
+
+	    # Prepare the dictionary to write
+	    dict = {}
+	    dict['date'] = time.strftime('%m/%d/%Y')
+	    dict['time'] = time.strftime('%H:%M:%S')
+	    dict['idorder'] = str(idorder).encode('ascii')
+	    dict['firstname'] = str(f_name).encode('ascii')
+	    dict['lastname'] = str(l_name).encode('ascii')
+	    dict['country'] = str(country).encode('ascii')
+	    dict['street1'] = str(street1).encode('ascii')
+	    dict['street2'] = str(street2).encode('ascii')
+            dict['city'] = str(city).encode('ascii')
+	    dict['state'] = str(state).encode('ascii')
+	    dict['zipcode'] = str(zip_code).encode('ascii')
+	    dict['price'] = str(price).encode('ascii')
+	    dict['size'] = str(size).encode('ascii')
+	    dict['imageurl'] = str(image_url).encode('ascii')
+
+   	    entry = spr_client.InsertRow(dict, spreadsheet_key, worksheet_id)
+	    if isinstance(entry, gdata.spreadsheet.SpreadsheetsList):
+ 		  msg_from.send()
+	          msg_to.send()
+	    else:
+  		print "Insert row failed."
            
-            msg_to.send()
+	
             return HttpResponseRedirect('/preview/' + str(idP))
     else:
         form = buyForm()
