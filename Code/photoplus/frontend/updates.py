@@ -60,7 +60,7 @@ def get_one_page_of_activities(page_token = '', max_res = '10'):
 	collection =         'public',
 	maxResults =         max_res,
 	pageToken =           page_token,
-	fields = 'nextPageToken,items(id, updated, url,  object(actor, content, attachments(id, objectType, fullImage/url)))'
+	fields = 'nextPageToken,items(id, updated, url,  object(actor, content, attachments(id,objectType, fullImage/url)))'
 	)
 	return request.execute()
 	
