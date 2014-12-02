@@ -2,20 +2,20 @@ from django.http         import Http404
 from django.shortcuts    import render_to_response
 from django.template     import Context, loader, Template
 from django.http         import HttpResponse
-from apiclient.discovery import build
-from frontend.models     import *
+#from apiclient.discovery import build
+from models     import *
 from sys                 import *
 from math                import *
 from django.core.mail      import send_mail
 from django.template       import RequestContext
 from django.http      import HttpResponseRedirect
-from frontend.forms       import ReCaptchaForm
-from frontend.forms       import buyForm
-from frontend.models      import *
+from forms       import ReCaptchaForm
+from forms       import buyForm
+from models      import *
 from django.core.mail      import EmailMultiAlternatives
 from django.core.mail      import EmailMessage
 from django.conf      import settings
-from email.MIMEImage      import MIMEImage
+#from email.MIMEImage      import MIMEImage
 from django          import template
 from config             import *
 # import gdata.photos.service
@@ -29,7 +29,7 @@ import datetime, time, calendar
 import gdata.spreadsheet.service
 
 import sys, traceback
-from frontend.updates   import *
+from updates   import *
 
 LAST_VISIT_TO_ACCOUNT = 0
 
@@ -273,7 +273,7 @@ def album( request , idA, page = 1):
     
     num_first = num_first + 1
     num_last = num_first + len(photos) - 1
-    
+
     return render_to_response('albums.html',{'photos':photos, 'album':album , 'album_list':al, 'paginator':paginator, 'nl':num_last, 'nf':num_first})
 
 
@@ -303,10 +303,6 @@ def home_page( request, page ):
 
 def home( request ):
     refresh_db_with_quantity(get_need_updates())
-
-    t = Thread(target = refresh_db_with_quantity, args = get_need_updates())
-    t.start()
-    t.join()
     try:
         last = Post.objects.order_by('-renew')[0:10]
         al = Album.objects.all()
@@ -317,9 +313,9 @@ def home( request ):
     pages = int(ceil(Post.objects.count() / 10.0))
     paginator = get_paginator_data( page, pages , 2 )
     num_last = len(last)
-    
-    
-    return render_to_response('index.html',{ 'last':last,'account': ACCOUNT_ID,'album_id': BEST_PHOTO_ALBUM, 'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al })
+
+
+    return render_to_response('index.html',{ 'last':last,'account': ACCOUNT_ID,'album_id': BEST_PHOTO_ALBUM, 'best':last[:3], 'paginator':paginator, 'nl':num_last, 'nf':1, 'album_list':al },refresh_db_with_quantity(get_need_updates()))
 
 def change_albums_name(album_name):
     album_name.strip()
