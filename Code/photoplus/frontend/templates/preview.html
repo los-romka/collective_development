@@ -1,59 +1,60 @@
 {% extends "header.html" %}
 {% block page %}
 	{% block content %} 
-<div id="content"> 
-	
-<legend>
-        <table WIDTH=100%>
-		<tr>
-			<td><h2 align="left">{{ photo.post_title }}</h2></td>
-			<td><h6 align="right">{{ photo.renew }}</h6></td>
-		<tr>
-	</table>
-</legend>
-<script type="text/javascript">
-						
-						$(document).ready(function(){
-							var mass = new Array();
-							var className = '';
-							$.get('https://picasaweb.google.com/data/feed/api/user/{{account}}/albumid/{{albumId}}/photoid/{{photoId}}?alt=json&access_token=989184939691',function(data){
-								
-								$("#image").html(
-										 "<img WIDTH=\"1024\" style=\"margin-top: 20px; margin-bottom: 20px;\"  class=\"shadow\" title=\"CLICK TO GO TO POST PAGE\" src=\""+data.feed.media$group.media$content[0].url+"\"/>"
-										 );
-							});
-						});
-						
-					</script>
-	{% if photo.post_url == null %}
-		<a href="{{ photo_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo_url }}"/></a>
-		<a href="{{ photo_url }}" target="_blank">CLICK HERE TO LEAVE COMMENT</a>
-		
-	{% else %}
-		<a href="{{ photo.post_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo.image_url }}"/></a>
-		<a href="{{ photo.post_url }}" target="_blank">CLICK HERE TO LEAVE COMMENT</a>
-	{% endif %}
-	<br><br>
-	<form>
-	{% for e in prices %}
-		<label class="radio">
-		<input type="radio" name="priceRadios" id="priceRadios{{ forloop.counter }}" value="{{ e.id }}"
-		{% if forloop.first %} checked{% endif %} />
-		{{ e.size }}*{{e.on}}
-		${{ e.price }}
-		</label>
-	{% endfor %}
-	</form>
-	<button id="buyButton" type="submit" class="btn">Order print</button>
-	<script>
-	console.log(document.location.href.split('/')[document.location.href.split('/').length-2]);
-	</script>
-	<script>
-			function buy_try() { 
-				document.location.href = '/buy/' + document.location.href.split('/')[document.location.href.split('/').length-2] + '/' + $('input[name="priceRadios"]:checked').val() + '/';
-			}
-			document.getElementById("buyButton").onclick = buy_try;
-	</script>
+	<div id="content">
+
+		<legend>
+				<table WIDTH=100%>
+				<tr>
+					<td><h2 align="left">{{ photo.post_title }}</h2></td>
+					<td><h6 align="right">{{ photo.renew }}</h6></td>
+				<tr>
+			</table>
+		</legend>
+		<script type="text/javascript">
+
+			$(document).ready(function(){
+				var mass = new Array();
+				var className = '';
+				$.get('https://picasaweb.google.com/data/feed/api/user/{{account}}/albumid/{{albumId}}/photoid/{{photoId}}?alt=json&access_token=989184939691',function(data){
+
+					$("#image").html(
+							 "<img WIDTH=\"1024\" style=\"margin-top: 20px; margin-bottom: 20px;\"  class=\"shadow\" title=\"CLICK TO GO TO POST PAGE\" src=\""+data.feed.media$group.media$content[0].url+"\"/>"
+							 );
+				});
+			});
+
+		</script>
+		{% if photo.post_url == null %}
+			<a href="{{ photo_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo_url }}"/></a>
+			<a href="{{ photo_url }}" target="_blank">CLICK HERE TO LEAVE COMMENT</a>
+
+		{% else %}
+			<a href="{{ photo.post_url }}" id="image"><img WIDTH="1024" style="margin-top: 20px; margin-bottom: 20px;"  class="shadow" title="CLICK TO GO TO POST PAGE" src="{{ photo.image_url }}"/></a>
+			<a href="{{ photo.post_url }}" target="_blank">CLICK HERE TO LEAVE COMMENT</a>
+		{% endif %}
+		<br><br>
+		<form>
+		{% for e in prices %}
+			<label class="radio">
+			<input type="radio" name="priceRadios" id="priceRadios{{ forloop.counter }}" value="{{ e.id }}"
+			{% if forloop.first %} checked{% endif %} />
+			{{ e.size }}*{{e.on}}
+			${{ e.price }}
+			</label>
+		{% endfor %}
+		</form>
+		<button id="buyButton" type="submit" class="btn">Order print</button>
+		<script>
+		console.log(document.location.href.split('/')[document.location.href.split('/').length-2]);
+		</script>
+		<script>
+				function buy_try() {
+					document.location.href = '/buy/' + document.location.href.split('/')[document.location.href.split('/').length-2] + '/' + $('input[name="priceRadios"]:checked').val() + '/';
+				}
+				document.getElementById("buyButton").onclick = buy_try;
+		</script>
+    </div>
 	{% endblock %}
 {% endblock %}
 
