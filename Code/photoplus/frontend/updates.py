@@ -203,7 +203,7 @@ def refresh_db_with_all ():
 	
 #functions for forced update
 
-def forced_refresh(request, mode):
+def forced_refresh(request, mode = 1):
 	
 	if int(mode) == 1:
 		refresh_db_with_quantity((100, []))
@@ -211,5 +211,5 @@ def forced_refresh(request, mode):
 		refresh_db_with_days(30)
 	if int(mode) == 3:
 		refresh_db_with_all()
-	return HttpResponseRedirect('../../admin/')
+	return HttpResponseRedirect('../../../../admin/')
 #end of functions for forced refresh
