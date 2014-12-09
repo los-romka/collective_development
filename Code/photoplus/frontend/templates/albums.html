@@ -17,10 +17,6 @@
 					<br><br>
 			    	</div>
 					{% endfor %}
-			    </div>
-				{% else %}
-					<h5 class="category">There is no photo!</h5>
-				{% endif %}
 				<div class="stop-div"></div>
 			    <div class="pagination pagination-centered">
 			    	<ul>
@@ -51,6 +47,10 @@
 						{% endif %}
 					</ul>
 				</div>
+			    </div>
+				{% else %}
+					<h5 class="category">There is no photo!</h5>
+				{% endif %}
 			</div>
 
 	{% endblock %}

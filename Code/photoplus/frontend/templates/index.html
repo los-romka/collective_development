@@ -58,40 +58,39 @@
 						</div>
 						{% endfor %}
 					</div>
-					
+					<div class="stop-div"></div>
+					<div class="pagination pagination-centered">
+						<ul>
+							{% if paginator.has_previous %}
+							<li><a href="/page/{{ paginator.previous }}/">&lt; Prev</a></li>
+							{% else %}
+							<li class="disabled"><a>&lt; Prev</a></li>
+							{% endif %}
+							{% if paginator.show_first %}
+							<li><a href="/page/1/">1</a></li>
+							<li class="disabled"><a>...</a></li>
+							{% endif %}
+							{% for linkpage in paginator.page_numbers %}
+								{% ifequal linkpage paginator.page %}
+								<li class="active"><a>{{ paginator.page }}</a></li>
+								{% else %}
+								<li><a href="/page/{{ linkpage }}/">{{ linkpage }}</a></li>
+								{% endifequal %}
+							{% endfor %}
+							{% if paginator.show_last %}
+							<li class="disabled"><a>...</a></li>
+							<li><a href="/page/{{ paginator.pages }}/">{{ paginator.pages }}</a></li>
+							{% endif %}
+							{% if paginator.has_next %}
+							<li><a href="/page/{{ paginator.next }}/">Next &gt;</a></li>
+							{% else %}
+							<li class="disabled"><a>Next &gt;</a></li>
+							{% endif %}
+						</ul>
+					</div>
 					{% else %}
 					<h5 class="category">There is no photo!</h5>
 					{% endif %}
-				<div class="stop-div"></div>
-			    <div class="pagination pagination-centered">
-			    	<ul>
-						{% if paginator.has_previous %}
-						<li><a href="/page/{{ paginator.previous }}/">&lt; Prev</a></li>
-						{% else %}
-						<li class="disabled"><a>&lt; Prev</a></li>
-						{% endif %}
-						{% if paginator.show_first %}
-						<li><a href="/page/1/">1</a></li>
-						<li class="disabled"><a>...</a></li>
-						{% endif %}
-						{% for linkpage in paginator.page_numbers %}
-                            {% ifequal linkpage paginator.page %}
-							<li class="active"><a>{{ paginator.page }}</a></li>
-							{% else %}
-							<li><a href="/page/{{ linkpage }}/">{{ linkpage }}</a></li>
-							{% endifequal %}
-						{% endfor %}
-						{% if paginator.show_last %}
-                        <li class="disabled"><a>...</a></li>
-						<li><a href="/page/{{ paginator.pages }}/">{{ paginator.pages }}</a></li>
-                        {% endif %}
-						{% if paginator.has_next %}
-						<li><a href="/page/{{ paginator.next }}/">Next &gt;</a></li>
-						{% else %}
-						<li class="disabled"><a>Next &gt;</a></li>
-						{% endif %}
-					</ul>
-				</div>
      			</div>
 	{% endblock %}
 {% endblock %}
